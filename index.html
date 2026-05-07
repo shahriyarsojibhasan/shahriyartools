@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  
+  <!-- Primary Meta Tags -->
+  <title>ShahriyarTools | Developer Toolbox by Shahriyar Sojib Hasan</title>
+  <meta name="title" content="ShahriyarTools | Developer Toolbox">
+  <meta name="description" content="A curated collection of professional web-based tools by Shahriyar Sojib Hasan. Currently featuring the Reunion Poster Studio — more coming soon.">
+  <meta name="author" content="Shahriyar Sojib Hasan">
+  <meta name="keywords" content="Shahriyar, tools, poster maker, reunion poster, web tools, developer, Bangladesh">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Favicon (using emoji fallback + simple SVG) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://shahriyartools.vercel.app/">
+  <meta property="og:title" content="ShahriyarTools | Developer Toolbox">
+  <meta property="og:description" content="Professional tools built by Shahriyar Sojib Hasan. Reunion Poster Studio and more.">
+  <meta property="og:image" content="https://shahriyartools.vercel.app/og-image.png">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://shahriyartools.vercel.app/">
+  <meta property="twitter:title" content="ShahriyarTools | Developer Toolbox">
+  <meta property="twitter:description" content="Professional tools built by Shahriyar Sojib Hasan.">
+  <meta property="twitter:image" content="https://shahriyartools.vercel.app/og-image.png">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#dc2626">
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(145deg, #f8fafc 0%, #eef2f6 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      color: #0f172a;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Header Section */
+    .hero {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #dc2626;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      letter-spacing: 0.5px;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.2);
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #0f172a 0%, #334155 80%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .highlight {
+      color: #dc2626;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      display: inline-block;
+    }
+
+    .subhead {
+      font-size: 1.25rem;
+      color: #475569;
+      max-width: 650px;
+      margin: 0 auto;
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    /* Tools Grid */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0 4rem;
+    }
+
+    .tool-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 28px;
+      padding: 2rem 1.8rem;
+      box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.12);
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 35px 50px -15px rgba(220, 38, 38, 0.2);
+      border-color: #dc2626;
+      background: white;
+    }
+
+    .tool-icon {
+      font-size: 3.2rem;
+      margin-bottom: 1.5rem;
+      color: #dc2626;
+      background: #fee2e2;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      box-shadow: 0 10px 15px -5px rgba(220, 38, 38, 0.1);
+    }
+
+    .tool-card h2 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .tool-desc {
+      color: #475569;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.8rem;
+    }
+
+    .tool-tag {
+      display: inline-block;
+      background: #e2e8f0;
+      color: #1e293b;
+      padding: 0.3rem 0.9rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .coming-soon {
+      opacity: 0.7;
+      cursor: default;
+      pointer-events: none;
+      filter: grayscale(0.3);
+    }
+    .coming-soon .tool-icon {
+      background: #e2e8f0;
+      color: #64748b;
+    }
+    .coming-soon .tool-tag {
+      background: #cbd5e1;
+    }
+
+    /* Social Section */
+    .social-section {
+      text-align: center;
+      margin-top: 1rem;
+      border-top: 1px solid #cbd5e1;
+      padding-top: 2.5rem;
+    }
+
+    .social-title {
+      font-weight: 600;
+      color: #334155;
+      letter-spacing: 0.5px;
+      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+    }
+
+    .social-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.2rem;
+    }
+
+    .social-link {
+      background: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1e293b;
+      font-size: 1.7rem;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.04);
+      transition: all 0.2s;
+      border: 1px solid #e2e8f0;
+      text-decoration: none;
+    }
+
+    .social-link:hover {
+      background: #0f172a;
+      color: white;
+      transform: scale(1.08);
+      border-color: #0f172a;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 3.5rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.95rem;
+    }
+
+    .footer a {
+      color: #dc2626;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .heart {
+      color: #dc2626;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      h1 { font-size: 2.5rem; }
+      .tool-card { padding: 1.8rem 1.5rem; }
+      .subhead { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="main-container">
+  
+  <!-- HERO -->
+  <div class="hero">
+    <span class="badge"><i class="fas fa-toolbox" style="margin-right: 6px;"></i> DEVELOPER TOOLBOX</span>
+    <h1>
+      <span class="highlight">Shahriyar</span>Tools
+    </h1>
+    <p class="subhead">
+      Handcrafted utilities for creators & developers.<br>
+      Built with precision by <strong>Shahriyar Sojib Hasan</strong>.
+    </p>
+  </div>
+
+  <!-- TOOLS GRID (বর্তমানে শুধু পোস্টার টুল) -->
+  <div class="tools-grid">
+    
+    <!-- REUNION POSTER STUDIO (Active) -->
+    <a href="reunionposter/index.html" class="tool-card">
+      <div class="tool-icon">
+        <i class="fas fa-paint-brush"></i>
+      </div>
+      <h2>Reunion Poster Studio</h2>
+      <p class="tool-desc">
+        Professional poster maker with 8 layouts, themes, drag-drop, pan/zoom, and 4K export. Perfect for reunions & events.
+      </p>
+      <span class="tool-tag"><i class="far fa-image" style="margin-right: 6px;"></i>Available Now</span>
+    </a>
+
+    <!-- FUTURE TOOL PLACEHOLDER (Coming Soon) -->
+    <div class="tool-card coming-soon">
+      <div class="tool-icon">
+        <i class="fas fa-hourglass-half"></i>
+      </div>
+      <h2>More Tools Soon</h2>
+      <p class="tool-desc">
+        Image compressor, invoice generator, PDF editor, and more. Stay tuned for updates.
+      </p>
+      <span class="tool-tag"><i class="far fa-clock" style="margin-right: 6px;"></i>Coming 2026</span>
+    </div>
+
+  </div>
+
+  <!-- SOCIAL MEDIA LINKS (all shahriyarsojibhasan) -->
+  <div class="social-section">
+    <div class="social-title">
+      <i class="fas fa-globe" style="margin-right: 8px;"></i> Connect with @shahriyarsojibhasan
+    </div>
+    <div class="social-links">
+      <a href="https://github.com/shahriyarsojibhasan" target="_blank" class="social-link" aria-label="GitHub">
+        <i class="fab fa-github"></i>
+      </a>
+      <a href="https://linkedin.com/in/shahriyarsojibhasan" target="_blank" class="social-link" aria-label="LinkedIn">
+        <i class="fab fa-linkedin-in"></i>
+      </a>
+      <a href="https://x.com/shahriyarsojibhasan" target="_blank" class="social-link" aria-label="X (Twitter)">
+        <i class="fab fa-x-twitter"></i>
+      </a>
+      <a href="https://facebook.com/shahriyarsojibhasan" target="_blank" class="social-link" aria-label="Facebook">
+        <i class="fab fa-facebook-f"></i>
+      </a>
+      <a href="https://instagram.com/shahriyarsojibhasan" target="_blank" class="social-link" aria-label="Instagram">
+        <i class="fab fa-instagram"></i>
+      </a>
+      <a href="https://youtube.com/@shahriyarsojibhasan" target="_blank" class="social-link" aria-label="YouTube">
+        <i class="fab fa-youtube"></i>
+      </a>
+    </div>
+    <p style="margin-top: 1.2rem; font-size: 0.9rem; color: #64748b;">
+      <i class="fas fa-code-branch"></i> All tools open-source on GitHub
+    </p>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p>
+      © 2026 <strong>ShahriyarTools</strong> — Designed & developed with 
+      <span class="heart"><i class="fas fa-heart"></i></span> by 
+      <a href="https://github.com/shahriyarsojibhasan" target="_blank">Shahriyar Sojib Hasan</a>.
+    </p>
+    <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+      <i class="far fa-copy"></i> Free for personal & commercial use. Contributions welcome.
+    </p>
+  </div>
+
+</div>
+
+<!-- Small script just for smooth interactions (no dependency) -->
+<script>
+  (function() {
+    // You can add future tool card dynamic generation here.
+    // For now just console greeting.
+    console.log('%c🛠️ ShahriyarTools — Developer Toolbox', 'font-size: 16px; font-weight: bold; color: #dc2626;');
+    console.log('%cBuilt by Shahriyar Sojib Hasan | @shahriyarsojibhasan', 'font-size: 13px; color: #334155;');
+  })();
+</script>
+
+</body>
+</html>
