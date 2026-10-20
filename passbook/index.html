@@ -37,6 +37,49 @@
             display: none !important;
         }
 
+    
+        /* Inside Front Cover Fluid Auto-Fit & Dynamic Scale System */
+        .passbook-page-inner[data-page-type="inside-cover"] {
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+        }
+
+        .inside-cover-scalable-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            transform-origin: top center;
+        }
+
+        /* Responsive adaptations for smaller passbook presets */
+        body[data-paper="small-pass"] .passbook-page-inner[data-page-type="inside-cover"],
+        body[data-paper="medium-pass"] .passbook-page-inner[data-page-type="inside-cover"],
+        body[data-paper="a5-pass"] .passbook-page-inner[data-page-type="inside-cover"] {
+            padding: 4px !important;
+        }
+
+        body[data-paper="small-pass"] .qr-box-square,
+        body[data-paper="medium-pass"] .qr-box-square {
+            width: 72px !important;
+            height: 72px !important;
+        }
+
+        body[data-paper="small-pass"] .inside-profile-box {
+            padding: 3px 6px !important;
+            margin-bottom: 3px !important;
+        }
+
+        body[data-paper="small-pass"] .inside-rules-box {
+            padding: 3px 6px !important;
+            margin-bottom: 3px !important;
+        }
+
     </style>
 
     <style>
@@ -3430,6 +3473,7 @@
             autoFitBookViewport();
             autoFitPrintSheets();
             renderAllPages(isSampleMode);
+            setTimeout(autoAdjustInsideCover, 50);
         }
 
         function changePrintOutputMode(mode) {
@@ -3726,22 +3770,22 @@
             `;
         }
 
-                // 2. INSIDE FRONT COVER (Customer Profile, Customer NID, Guarantor NID, Baki Rules, DEFAULT TICK REMOVED)
+                        // 2. INSIDE FRONT COVER (Customer Profile, Customer NID, Guarantor NID, Baki Rules, QR Section & Signatures)
         function getInsideFrontCoverHTML() {
             const bakiChoiceHTML = customConfig.showBakiChoice ? `
-                <div class="text-center font-extrabold text-[8.2pt] py-0.5 rounded text-white mb-1" style="background-color: var(--theme-accent);" contenteditable="true">
+                <div class="text-center font-extrabold text-[7.5pt] py-0.5 rounded text-white mb-1" style="background-color: var(--theme-accent);" contenteditable="true">
                     বাকির ধরন ও পরিশোধের সময়সীমা (যেকোনো একটিতে টিক ✓ দিন)
                 </div>
-                <div class="grid grid-cols-3 gap-1 mb-2">
-                    <div class="baki-choice-row" onclick="toggleBakiCheckbox(this)">
+                <div class="grid grid-cols-3 gap-1 mb-1">
+                    <div class="baki-choice-row py-0.5 text-[7.5pt]" onclick="toggleBakiCheckbox(this)">
                         <span contenteditable="true">বাকি = ৭ দিন</span>
                         <span class="baki-checkbox-box"></span>
                     </div>
-                    <div class="baki-choice-row" onclick="toggleBakiCheckbox(this)">
+                    <div class="baki-choice-row py-0.5 text-[7.5pt]" onclick="toggleBakiCheckbox(this)">
                         <span contenteditable="true">বাকি = ১৫ দিন</span>
                         <span class="baki-checkbox-box"></span>
                     </div>
-                    <div class="baki-choice-row" onclick="toggleBakiCheckbox(this)">
+                    <div class="baki-choice-row py-0.5 text-[7.5pt]" onclick="toggleBakiCheckbox(this)">
                         <span contenteditable="true">বাকি = ৩০ দিন</span>
                         <span class="baki-checkbox-box"></span>
                     </div>
@@ -3750,132 +3794,134 @@
 
             return `
                 <div class="passbook-page-inner" data-page-type="inside-cover">
-                    <div>
-                        <div class="text-center py-0.5 px-2 rounded font-bold text-white text-[8.5pt] mb-1.5" style="background-color: var(--theme-primary);" contenteditable="true">
-                            গ্রাহকের পূর্ণাঙ্গ পরিচিতি, জামিনদার ও বাকির নীতিমালা
-                        </div>
+                    <div class="inside-cover-scalable-wrapper">
+                        <div>
+                            <div class="text-center py-0.5 px-2 rounded font-bold text-white text-[8pt] mb-1" style="background-color: var(--theme-primary);" contenteditable="true">
+                                গ্রাহকের পূর্ণাঙ্গ পরিচিতি, জামিনদার ও বাকির নীতিমালা
+                            </div>
 
-                        <!-- Customer Full Profile & Guarantor Details (Including Customer NID & Guarantor NID) -->
-                        <div class="border-2 border-slate-700 rounded bg-white p-2 space-y-1 mb-1.5">
-                            <div class="dotted-row text-[9pt]">
-                                <span class="dotted-label font-extrabold text-emerald-900" contenteditable="true">১. গ্রাহকের নিজ নাম =</span>
-                                <div class="dotted-input font-bold" contenteditable="true" data-sync="customerName">${shopConfig.customerName}</div>
-                            </div>
-                            <div class="dotted-row text-[8.8pt]">
-                                <span class="dotted-label" contenteditable="true">২. পিতা / স্বামীর নাম =</span>
-                                <div class="dotted-input" contenteditable="true"></div>
-                            </div>
-                            <div class="dotted-row text-[8.8pt]">
-                                <span class="dotted-label" contenteditable="true">৩. মাতার নাম =</span>
-                                <div class="dotted-input" contenteditable="true"></div>
-                            </div>
-                            <div class="dotted-row text-[8.8pt]">
-                                <span class="dotted-label" contenteditable="true">৪. গ্রাম / স্থায়ী ঠিকানা =</span>
-                                <div class="dotted-input" contenteditable="true"></div>
-                            </div>
-                            <div class="dotted-row text-[8.8pt]">
-                                <span class="dotted-label" contenteditable="true">৫. সচল মোবাইল নং =</span>
-                                <div class="dotted-input font-bold" contenteditable="true"></div>
-                            </div>
-                            <!-- Customer NID (User Requirement) -->
-                            <div class="dotted-row text-[8.8pt]">
-                                <span class="dotted-label font-bold text-slate-900" contenteditable="true">৬. গ্রাহকের জাতীয় পরিচয়পত্র (NID) নং =</span>
-                                <div class="dotted-input font-bold" contenteditable="true"></div>
-                            </div>
-                            <!-- Guarantor Details & Guarantor NID (User Requirement) -->
-                            <div class="dotted-row text-[8.8pt]" style="background-color: #fefce8; padding: 1px 3px; border-radius: 2px;">
-                                <span class="dotted-label font-bold text-amber-950" contenteditable="true">৭. জামিনদারের নাম ও মোবাইল =</span>
-                                <div class="dotted-input font-bold" contenteditable="true"></div>
-                            </div>
-                            <div class="dotted-row text-[8.8pt]" style="background-color: #fefce8; padding: 1px 3px; border-radius: 2px;">
-                                <span class="dotted-label font-bold text-amber-950" contenteditable="true">৮. জামিনদারের জাতীয় পরিচয়পত্র (NID) নং =</span>
-                                <div class="dotted-input font-bold" contenteditable="true"></div>
-                            </div>
-                            <div class="dotted-row text-[8.8pt]" style="margin-bottom: 0;">
-                                <span class="dotted-label" contenteditable="true">৯. জামিনদারের স্থায়ী ঠিকানা =</span>
-                                <div class="dotted-input" contenteditable="true"></div>
-                            </div>
-                        </div>
-
-                        ${bakiChoiceHTML}
-
-                                                <!-- Baki Pre-Conditions (with Guarantor Clause & Photo/NID Requirement) -->
-                        <div class="border-2 rounded p-1.5 bg-red-50/80 mb-1.5" style="border-color: var(--theme-accent);">
-                            <div class="font-extrabold text-[8.2pt] text-center mb-0.5 text-red-900" contenteditable="true">
-                                ⚖️ বাকি নেওয়ার বিশেষ পূর্বশর্তাবলী ও নীতিমালা
-                            </div>
-                            <ol class="list-decimal pl-4 space-y-0.5 text-[7.8pt] font-semibold text-slate-800 leading-snug" contenteditable="true">
-                                <li><strong>পাস বই বাধ্যতামূলক:</strong> বাকিতে মুদি, মনিহারী বা সার-কীটনাশক নেওয়ার সময় এই পাস বই সাথে থাকা বাধ্যতামূলক।</li>
-                                <li><strong>পূর্বের জের পরিশোধ:</strong> নির্ধারিত মেয়াদে পূর্বের জের পরিশোধ না করা পর্যন্ত পুনরায় কোনো মালামাল বাকিতে দেওয়া হবে না।</li>
-                                <li><strong>জামিনদার শর্ত:</strong> বিশেষ বা বড় অঙ্কের বাকির ক্ষেত্রে উপযুক্ত জামিনদার থাকা আবশ্যক। গ্রাহক নির্ধারিত সময়ে বকেয়া পরিশোধে ব্যর্থ হলে জামিনদার উক্ত টাকার দায়ভার গ্রহণ করতে বাধ্য থাকিবেন।</li>
-                                <li><strong>স্বাক্ষর ও হিসাব যাচাই:</strong> মাল নেওয়া ও টাকা জমার সময় তাৎক্ষণিক বই মিলিয়ে দোকানদার ও গ্রাহক উভয়ে স্বাক্ষর করবেন। পরবর্তীতে কোনো মৌখিক দাবি গ্রহণযোগ্য হবে না।</li>
-                                <li><strong>বইয়ের হেফাজত:</strong> বইয়ে কোনো কাটাকাটি বা ঘষামাঝা নিষিদ্ধ। বই হারালে তাৎক্ষণিক দোকানে জানিয়ে নির্দিষ্ট ফিতে নতুন বই সংগ্রহ করতে হবে।</li>
-                                <li><strong>ছবি ও এনআইডি জমা:</strong> গ্রাহক ও জামিনদারের ১ কপি পাসপোর্ট সাইজ ছবি ও ১ কপি এনআইডি (NID) কার্ডের ফটোকপি জমা দেওয়া বাধ্যতামূলক।</li>
-                            </ol>
-                        </div>
-
-                                                <!-- Digital Payment & Cashout QR Section (User Requirement: Square QR codes with external typography) -->
-                        <div class="mt-1 p-2 rounded-xl border border-slate-300 bg-gradient-to-b from-slate-50 via-white to-slate-50 shadow-xs">
-                            <div class="text-center font-black text-[8pt] text-slate-900 mb-1.5 flex items-center justify-center gap-1.5 border-b border-dashed border-slate-200 pb-1">
-                                <span class="bg-indigo-700 text-white text-[6.5pt] px-1.5 py-0.2 rounded font-black tracking-wider uppercase shadow-xs">Scan & Pay</span>
-                                <span>📱 ডিজিটাল পেমেন্ট ও ক্যাশআউট কিউআর কোড (ক্যামেরা দিয়ে সহজে স্ক্যান করুন)</span>
-                            </div>
-                            <div class="grid grid-cols-3 gap-3 px-0.5 items-stretch text-center">
-                                <!-- Card 1: Shahriyar Store (Payment) -->
-                                <div class="bg-white rounded-lg border-2 border-amber-300 p-1.5 flex flex-col items-center justify-between shadow-xs">
-                                    <div class="w-full mb-1">
-                                        <div class="text-[8.5pt] font-black text-amber-950 leading-tight">শাহরিয়ার স্টোর</div>
-                                        <div class="text-[6.5pt] font-bold text-sky-800 leading-tight">যেকোনো ব্যাংক বা MFS পেমেন্ট</div>
-                                    </div>
-                                    <div class="w-[96px] h-[96px] p-1 bg-white border border-red-300 rounded-lg flex items-center justify-center shadow-xs my-0.5">
-                                        <img src="${LOGOS.qrPaymentShahriyarSq || 'passbook front cover/qr_payment_shahriyar_sq.jpg'}" alt="শাহরিয়ার স্টোর কিউআর" class="w-full h-full object-contain select-none" />
-                                    </div>
-                                    <div class="w-full mt-1">
-                                        <div class="text-[7.5pt] font-black text-sky-900 leading-tight">শুধুমাত্র পেমেন্ট</div>
-                                        <div class="text-[6pt] font-semibold text-slate-500">বিকাশ • নগদ • রকেট • কার্ড</div>
-                                    </div>
+                            <!-- Customer Full Profile & Guarantor Details (Including Customer NID & Guarantor NID) -->
+                            <div class="inside-profile-box border-2 border-slate-700 rounded bg-white px-2 py-1 space-y-0.5 mb-1 text-[8pt]">
+                                <div class="dotted-row text-[8.2pt]">
+                                    <span class="dotted-label font-extrabold text-emerald-900" contenteditable="true">১. গ্রাহকের নিজ নাম =</span>
+                                    <div class="dotted-input font-bold" contenteditable="true" data-sync="customerName">${shopConfig.customerName}</div>
                                 </div>
-
-                                <!-- Card 2: bKash Agent (Cash Out) -->
-                                <div class="bg-white rounded-lg border-2 border-pink-400 p-1.5 flex flex-col items-center justify-between shadow-xs">
-                                    <div class="w-full mb-1">
-                                        <div class="inline-block bg-pink-700 text-white text-[7.5pt] font-black px-1.5 py-0.2 rounded leading-tight">বিকাশ এজেন্ট</div>
-                                        <div class="text-[6.5pt] font-bold text-slate-800 leading-tight mt-0.5">ক্যাশ আউট (M/S ALEYA TRADERS)</div>
-                                    </div>
-                                    <div class="w-[96px] h-[96px] p-1 bg-white border border-pink-300 rounded-lg flex items-center justify-center shadow-xs my-0.5">
-                                        <img src="${LOGOS.qrBkashAgentCashoutSq || 'passbook front cover/qr_bkash_agent_cashout_sq.jpg'}" alt="বিকাশ এজেন্ট কিউআর" class="w-full h-full object-contain select-none" />
-                                    </div>
-                                    <div class="w-full mt-1">
-                                        <div class="text-[8.5pt] font-black text-slate-950 font-mono tracking-tight leading-tight">01771-653770</div>
-                                        <div class="text-[6.2pt] font-bold text-pink-700 leading-tight">ক্যাশ আউট এজেন্ট | bKash</div>
-                                    </div>
+                                <div class="dotted-row text-[8pt]">
+                                    <span class="dotted-label" contenteditable="true">২. পিতা / স্বামীর নাম =</span>
+                                    <div class="dotted-input" contenteditable="true"></div>
                                 </div>
-
-                                <!-- Card 3: Aleya Traders (Merchant Payment) -->
-                                <div class="bg-white rounded-lg border-2 border-sky-400 p-1.5 flex flex-col items-center justify-between shadow-xs">
-                                    <div class="w-full mb-1">
-                                        <div class="inline-block bg-sky-900 text-white text-[7.5pt] font-black px-1.5 py-0.2 rounded leading-tight">মেসার্স আলেয়া ট্রেডার্স</div>
-                                        <div class="text-[6.5pt] font-bold text-slate-800 leading-tight mt-0.5">পেমেন্ট (Bangla QR)</div>
-                                    </div>
-                                    <div class="w-[96px] h-[96px] p-1 bg-white border border-sky-300 rounded-lg flex items-center justify-center shadow-xs my-0.5">
-                                        <img src="${LOGOS.qrAleyaMerchantSq || 'passbook front cover/qr_aleya_traders_merchant_sq.jpg'}" alt="আলেয়া ট্রেডার্স মার্চেন্ট কিউআর" class="w-full h-full object-contain select-none" />
-                                    </div>
-                                    <div class="w-full mt-1">
-                                        <div class="text-[7.2pt] font-black text-sky-950 leading-tight">M/S ALEYA TRADERS</div>
-                                        <div class="text-[6.2pt] font-extrabold text-slate-700 leading-tight">মার্চেন্ট নং: 10000001</div>
-                                    </div>
+                                <div class="dotted-row text-[8pt]">
+                                    <span class="dotted-label" contenteditable="true">৩. মাতার নাম =</span>
+                                    <div class="dotted-input" contenteditable="true"></div>
+                                </div>
+                                <div class="dotted-row text-[8pt]">
+                                    <span class="dotted-label" contenteditable="true">৪. গ্রাম / স্থায়ী ঠিকানা =</span>
+                                    <div class="dotted-input" contenteditable="true"></div>
+                                </div>
+                                <div class="dotted-row text-[8pt]">
+                                    <span class="dotted-label" contenteditable="true">৫. সচল মোবাইল নং =</span>
+                                    <div class="dotted-input font-bold" contenteditable="true"></div>
+                                </div>
+                                <!-- Customer NID -->
+                                <div class="dotted-row text-[8pt]">
+                                    <span class="dotted-label font-bold text-slate-900" contenteditable="true">৬. গ্রাহকের জাতীয় পরিচয়পত্র (NID) নং =</span>
+                                    <div class="dotted-input font-bold" contenteditable="true"></div>
+                                </div>
+                                <!-- Guarantor Details & Guarantor NID -->
+                                <div class="dotted-row text-[8pt]" style="background-color: #fefce8; padding: 1px 3px; border-radius: 2px;">
+                                    <span class="dotted-label font-bold text-amber-950" contenteditable="true">৭. জামিনদারের নাম ও মোবাইল =</span>
+                                    <div class="dotted-input font-bold" contenteditable="true"></div>
+                                </div>
+                                <div class="dotted-row text-[8pt]" style="background-color: #fefce8; padding: 1px 3px; border-radius: 2px;">
+                                    <span class="dotted-label font-bold text-amber-950" contenteditable="true">৮. জামিনদারের জাতীয় পরিচয়পত্র (NID) নং =</span>
+                                    <div class="dotted-input font-bold" contenteditable="true"></div>
+                                </div>
+                                <div class="dotted-row text-[8pt]" style="margin-bottom: 0;">
+                                    <span class="dotted-label" contenteditable="true">৯. জামিনদারের স্থায়ী ঠিকানা =</span>
+                                    <div class="dotted-input" contenteditable="true"></div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Signatures (Inside Front Cover: Perfectly aligned grid row) -->
-                    <div class="mt-auto pt-1">
-                        <div class="h-3"></div>
-                        <div class="grid grid-cols-3 gap-4 text-center text-[8.2pt] font-bold text-slate-800">
-                            <div class="border-t-2 border-slate-800 pt-1" contenteditable="true">গ্রাহকের স্বাক্ষর</div>
-                            <div class="border-t-2 border-slate-800 pt-1 text-amber-900" contenteditable="true">জামিনদারের স্বাক্ষর</div>
-                            <div class="border-t-2 border-slate-800 pt-1" contenteditable="true">মালিকের স্বাক্ষর ও সিল</div>
+                            ${bakiChoiceHTML}
+
+                            <!-- Baki Pre-Conditions (with Guarantor Clause & Photo/NID Requirement) -->
+                            <div class="inside-rules-box border-2 rounded px-2 py-1 bg-red-50/80 mb-1" style="border-color: var(--theme-accent);">
+                                <div class="font-extrabold text-[7.8pt] text-center mb-0.5 text-red-900" contenteditable="true">
+                                    ⚖️ বাকি নেওয়ার বিশেষ পূর্বশর্তাবলী ও নীতিমালা
+                                </div>
+                                <ol class="list-decimal pl-3.5 space-y-0.2 text-[7.2pt] font-semibold text-slate-800 leading-tight" contenteditable="true">
+                                    <li><strong>পাস বই বাধ্যতামূলক:</strong> বাকিতে মুদি, মনিহারী বা সার-কীটনাশক নেওয়ার সময় এই পাস বই সাথে থাকা বাধ্যতামূলক।</li>
+                                    <li><strong>পূর্বের জের পরিশোধ:</strong> নির্ধারিত মেয়াদে পূর্বের জের পরিশোধ না করা পর্যন্ত পুনরায় কোনো মালামাল বাকিতে দেওয়া হবে না।</li>
+                                    <li><strong>জামিনদার শর্ত:</strong> বিশেষ বা বড় অঙ্কের বাকির ক্ষেত্রে উপযুক্ত জামিনদার থাকা আবশ্যক। গ্রাহক নির্ধারিত সময়ে বকেয়া পরিশোধে ব্যর্থ হলে জামিনদার দায়ভার গ্রহণ করতে বাধ্য থাকিবেন।</li>
+                                    <li><strong>স্বাক্ষর ও হিসাব যাচাই:</strong> মাল নেওয়া ও টাকা জমার সময় তাৎক্ষণিক বই মিলিয়ে উভয়পক্ষ স্বাক্ষর করবেন।</li>
+                                    <li><strong>বইয়ের হেফাজত:</strong> বইয়ে কাটাকাটি বা ঘষামাঝা নিষিদ্ধ। বই হারালে নির্দিষ্ট ফিতে নতুন বই সংগ্রহ করতে হবে।</li>
+                                    <li><strong>ছবি ও এনআইডি জমা:</strong> গ্রাহক ও জামিনদারের ১ কপি পাসপোর্ট ছবি ও এনআইডি (NID) ফটোকপি দেওয়া বাধ্যতামূলক।</li>
+                                </ol>
+                            </div>
+
+                            <!-- Digital Payment & Cashout QR Section (Fluid & Adaptive Square QRs) -->
+                            <div class="p-1 rounded-xl border border-slate-300 bg-gradient-to-b from-slate-50 via-white to-slate-50 shadow-xs mb-1">
+                                <div class="text-center font-black text-[7.5pt] text-slate-900 mb-0.5 flex items-center justify-center gap-1.5 border-b border-dashed border-slate-200 pb-0.5">
+                                    <span class="bg-indigo-700 text-white text-[6pt] px-1.5 py-0.2 rounded font-black tracking-wider uppercase shadow-xs">Scan & Pay</span>
+                                    <span>📱 ডিজিটাল পেমেন্ট ও ক্যাশআউট কিউআর কোড</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2 px-0.5 items-stretch text-center">
+                                    <!-- Card 1: Shahriyar Store (Payment) -->
+                                    <div class="bg-white rounded-lg border-2 border-amber-300 p-1 flex flex-col items-center justify-between shadow-xs">
+                                        <div class="w-full mb-0.5">
+                                            <div class="text-[7.5pt] font-black text-amber-950 leading-tight">শাহরিয়ার স্টোর</div>
+                                            <div class="text-[5.5pt] font-bold text-sky-800 leading-tight">যেকোনো ব্যাংক/MFS পেমেন্ট</div>
+                                        </div>
+                                        <div class="qr-box-square w-[76px] h-[76px] p-0.5 bg-white border border-red-300 rounded-md flex items-center justify-center shadow-xs my-0.5">
+                                            <img src="${LOGOS.qrPaymentShahriyarSq || 'passbook front cover/qr_payment_shahriyar_sq.jpg'}" alt="শাহরিয়ার স্টোর কিউআর" class="w-full h-full object-contain select-none" />
+                                        </div>
+                                        <div class="w-full mt-0.5">
+                                            <div class="text-[6.8pt] font-black text-sky-900 leading-tight">শুধুমাত্র পেমেন্ট</div>
+                                            <div class="text-[5.2pt] font-semibold text-slate-500 leading-none">বিকাশ•নগদ•রকেট•কার্ড</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Card 2: bKash Agent (Cash Out) -->
+                                    <div class="bg-white rounded-lg border-2 border-pink-400 p-1 flex flex-col items-center justify-between shadow-xs">
+                                        <div class="w-full mb-0.5">
+                                            <div class="inline-block bg-pink-700 text-white text-[6.8pt] font-black px-1 py-0.2 rounded leading-tight">বিকাশ এজেন্ট</div>
+                                            <div class="text-[5.5pt] font-bold text-slate-800 leading-tight mt-0.5 truncate">ক্যাশ আউট (ALEYA)</div>
+                                        </div>
+                                        <div class="qr-box-square w-[76px] h-[76px] p-0.5 bg-white border border-pink-300 rounded-md flex items-center justify-center shadow-xs my-0.5">
+                                            <img src="${LOGOS.qrBkashAgentCashoutSq || 'passbook front cover/qr_bkash_agent_cashout_sq.jpg'}" alt="বিকাশ এজেন্ট কিউআর" class="w-full h-full object-contain select-none" />
+                                        </div>
+                                        <div class="w-full mt-0.5">
+                                            <div class="text-[7.8pt] font-black text-slate-950 font-mono tracking-tight leading-tight">01771-653770</div>
+                                            <div class="text-[5.5pt] font-bold text-pink-700 leading-tight">ক্যাশ আউট এজেন্ট | bKash</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Card 3: Aleya Traders (Merchant Payment) -->
+                                    <div class="bg-white rounded-lg border-2 border-sky-400 p-1 flex flex-col items-center justify-between shadow-xs">
+                                        <div class="w-full mb-0.5">
+                                            <div class="inline-block bg-sky-900 text-white text-[6.8pt] font-black px-1 py-0.2 rounded leading-tight">মেসার্স আলেয়া ট্রেডার্স</div>
+                                            <div class="text-[5.5pt] font-bold text-slate-800 leading-tight mt-0.5">পেমেন্ট (Bangla QR)</div>
+                                        </div>
+                                        <div class="qr-box-square w-[76px] h-[76px] p-0.5 bg-white border border-sky-300 rounded-md flex items-center justify-center shadow-xs my-0.5">
+                                            <img src="${LOGOS.qrAleyaMerchantSq || 'passbook front cover/qr_aleya_traders_merchant_sq.jpg'}" alt="আলেয়া ট্রেডার্স কিউআর" class="w-full h-full object-contain select-none" />
+                                        </div>
+                                        <div class="w-full mt-0.5">
+                                            <div class="text-[6.8pt] font-black text-sky-950 leading-tight truncate">M/S ALEYA TRADERS</div>
+                                            <div class="text-[5.5pt] font-extrabold text-slate-700 leading-tight">মার্চেন্ট: 10000001</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Signatures (Inside Front Cover: Perfectly aligned grid row) -->
+                        <div class="mt-auto pt-0.5 border-t border-slate-300/80">
+                            <div class="h-2"></div>
+                            <div class="grid grid-cols-3 gap-3 text-center text-[7.8pt] font-bold text-slate-800">
+                                <div class="border-t-2 border-slate-800 pt-0.5" contenteditable="true">গ্রাহকের স্বাক্ষর</div>
+                                <div class="border-t-2 border-slate-800 pt-0.5 text-amber-900" contenteditable="true">জামিনদারের স্বাক্ষর</div>
+                                <div class="border-t-2 border-slate-800 pt-0.5" contenteditable="true">মালিকের স্বাক্ষর ও সিল</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4199,6 +4245,31 @@
             return { totalPages: N, physicalSheets: K, spreads };
         }
 
+                // Auto-Adjust Inside Front Cover to Guarantee Zero Overflow on ANY Scale / Paper Size
+        function autoAdjustInsideCover() {
+            const pages = document.querySelectorAll('.passbook-page-inner[data-page-type="inside-cover"]');
+            pages.forEach(page => {
+                const wrapper = page.querySelector('.inside-cover-scalable-wrapper');
+                if (!wrapper) return;
+
+                wrapper.style.transform = 'none';
+                wrapper.style.width = '100%';
+
+                const availH = page.clientHeight;
+                const reqH = wrapper.scrollHeight;
+
+                if (availH > 0 && reqH > availH) {
+                    const scale = Math.floor((availH / reqH) * 98) / 100;
+                    wrapper.style.transformOrigin = 'top center';
+                    wrapper.style.transform = `scale(${scale})`;
+                    wrapper.style.width = `${Math.round((100 / scale) * 100) / 100}%`;
+                } else {
+                    wrapper.style.transform = 'none';
+                    wrapper.style.width = '100%';
+                }
+            });
+        }
+
         function renderAllPages(withSample = false) {
             const leavesContainer = document.getElementById('leavesContainer') || document.getElementById('book-leaves-container');
             const printSheetsContainer = document.getElementById('printSheetsContainer') || document.getElementById('print-sheets-container');
@@ -4318,6 +4389,7 @@
             update3DBookState(false);
             attachSyncAndCalcListeners();
             syncRibbonInputs();
+            autoAdjustInsideCover();
         }
 
         // Leaf / Page Management
@@ -6305,6 +6377,7 @@
         window.addEventListener('resize', () => {
             if (currentViewMode === 'print') autoFitPrintSheets();
             else autoFitBookViewport();
+            autoAdjustInsideCover();
         });
 
         // Responsive dynamic auto-fit on window resize and sidebar expansion/collapse
@@ -6314,6 +6387,7 @@
                 new ResizeObserver(() => {
                     if (currentViewMode === 'print') autoFitPrintSheets();
                     else autoFitBookViewport();
+                    autoAdjustInsideCover();
                 }).observe(cCanvas);
             }
         }
@@ -6323,6 +6397,7 @@
             document.documentElement.style.setProperty('--cover-img-scale', initScale);
             document.documentElement.style.setProperty('--cover-img-y', (customConfig.coverImgY || 0) + 'px');
             renderAllPages(false);
+            setTimeout(autoAdjustInsideCover, 60);
             currentBookState = 0;
             update3DBookState(false);
             syncRibbonInputs();
