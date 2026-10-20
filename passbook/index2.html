@@ -1956,6 +1956,11 @@
                 title="ফটোশপ এডিটেবল PSD ফাইল ডাউনলোড করুন">
                 <span class="font-black text-[10px] bg-sky-950 px-1 py-0.2 rounded border border-sky-400">Ps</span> <span class="hidden sm:inline">Photoshop (PSD)</span>
             </button>
+            <button onclick="downloadAIFile('ai')"
+                class="px-2.5 py-1 rounded bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold shadow transition flex items-center gap-1 text-xs cursor-pointer"
+                title="Adobe Illustrator (.ai) এডিটেবল ভেক্টর এক্সপোর্ট">
+                <span class="font-black text-[10px] bg-slate-950 text-amber-300 px-1 rounded border border-amber-400">Ai</span> <span class="hidden sm:inline">Illustrator (.ai)</span>
+            </button>
             <button id="btnToggleRightSidebar" onclick="toggleRightSidebar()"
                 class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-yellow-300 font-bold text-xs flex items-center gap-1 transition shadow-sm"
                 title="দোকান ও কাস্টমার তথ্য সাইডবার লুকান/দেখান">
@@ -2486,6 +2491,16 @@
                     <button onclick="downloadPSDFile()"
                         class="w-full py-1.5 rounded bg-gradient-to-r from-sky-700 to-indigo-700 hover:from-sky-600 hover:to-indigo-600 text-white font-bold text-xs shadow flex items-center justify-center gap-1.5 transition">
                         <span class="font-black text-[11px] bg-slate-900 px-1.5 py-0.5 rounded border border-sky-400">Ps</span> <span>Photoshop (PSD) এক্সপোর্ট</span>
+                    </button>
+                    <button onclick="downloadAIFile('ai')"
+                        class="w-full py-1.5 rounded bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 text-white font-bold text-xs shadow flex items-center justify-center gap-1.5 transition cursor-pointer"
+                        title="Adobe Illustrator (.ai) ভেক্টর ফাইল ডাউনলোড (ইলাস্ট্রেটরে লেখার সাইজ ইচ্ছামতো ছোট-বড় ও এডিটযোগ্য)">
+                        <span class="font-black text-[11px] bg-slate-950 text-amber-300 px-1.5 py-0.5 rounded border border-amber-400">Ai</span> <span>Adobe Illustrator (.ai) এক্সপোর্ট</span>
+                    </button>
+                    <button onclick="downloadAIFile('svg')"
+                        class="w-full py-1 rounded bg-slate-800 hover:bg-slate-700 border border-amber-500/50 text-amber-200 font-semibold text-[11px] flex items-center justify-center gap-1 transition cursor-pointer"
+                        title="Adobe Illustrator এ সম্পূর্ণ লাইভ বাংলা টেক্সট ও ফন্ট সাইজ অ্যাডজাস্টমেন্ট ভেক্টর">
+                        <span>📐</span> <span>ইলাস্ট্রেটর ভেক্টর (.svg) - লাইভ টেক্সট</span>
                     </button>
                     <button onclick="toggleFullScreen()"
                         class="w-full py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-semibold text-xs flex items-center justify-center gap-1">
@@ -5336,6 +5351,306 @@
             });
             showToast(showCenterFoldCutLine ? '✂️ মাঝের ভাঁজ ও কাটিং দাগ চালু করা হয়েছে' : '🚫 মাঝের ভাঁজ ও কাটিং দাগ বন্ধ (লুকানো) হয়েছে');
         }
+
+        
+        // -------------------------------------------------------------
+        // ADOBE ILLUSTRATOR (.AI / SVG) VECTOR EXPORT ENGINE
+        // -------------------------------------------------------------
+        function downloadAIFile(format = 'ai') {
+            const isAi = (format === 'ai');
+            showToast(isAi ? '🎨 Adobe Illustrator (.ai) ফাইল প্রস্তুত হচ্ছে...' : '📐 Illustrator ভেক্টর (.svg) প্রস্তুত হচ্ছে...');
+
+            try {
+                const conf = (typeof paperSizes !== 'undefined' && paperSizes[currentPaperKey]) ? paperSizes[currentPaperKey] : { closedW: 148.5, closedH: 210 };
+                const w_mm = conf.closedW || 148.5;
+                const h_mm = conf.closedH || 210;
+                const w_pt = Math.round(w_mm * 72 / 25.4 * 10) / 10;
+                const h_pt = Math.round(h_mm * 72 / 25.4 * 10) / 10;
+
+                const activeIdx = (typeof getActiveCoverThemeIndex === 'function') ? getActiveCoverThemeIndex() : 0;
+                const d = (typeof COVER_DESIGNS !== 'undefined' && COVER_DESIGNS[activeIdx]) ? COVER_DESIGNS[activeIdx] : { id: 'passbook', name: 'বাকির_পাস_বই' };
+
+                const fontScale = (typeof currentFontScale !== 'undefined') ? currentFontScale : 1.0;
+                const shopName = (typeof shopConfig !== 'undefined' && shopConfig.shopName) ? shopConfig.shopName : 'মেসার্স আলেয়া ট্রেডার্স';
+                const propName = (typeof shopConfig !== 'undefined' && shopConfig.propName) ? shopConfig.propName : 'প্রোঃ মোঃ আশরাফুল ইসলাম';
+                const founderName = (typeof shopConfig !== 'undefined' && shopConfig.founderName) ? shopConfig.founderName : 'প্রতিষ্ঠাতাঃ মোঃ জয়নাল আবেদীন';
+                const address = (typeof shopConfig !== 'undefined' && shopConfig.address) ? shopConfig.address : 'মহিষ্ট্র, কিচক, শিবগঞ্জ, বগুড়া';
+                const mobile = (typeof shopConfig !== 'undefined' && shopConfig.mobile) ? shopConfig.mobile : '০১৭২৮-৩৬০২৪০';
+                const goodsDesc = (typeof shopConfig !== 'undefined' && shopConfig.goodsDesc) ? shopConfig.goodsDesc : 'এখানে উন্নত মানের মুদি ও মনিহারী মালামাল সুলভ মূল্যে বিক্রয় করা হয়।';
+
+                if (isAi) {
+                    const aiData = buildAdobeIllustratorData({
+                        widthPt: w_pt,
+                        heightPt: h_pt,
+                        shopName,
+                        propName,
+                        founderName,
+                        address,
+                        mobile,
+                        goodsDesc,
+                        fontScale,
+                        themeName: d.name
+                    });
+
+                    const blob = new Blob([aiData], { type: 'application/illustrator;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `মেসার্স_আলেয়া_ট্রেডার্স_মুদি_ও_বাকির_পাস_বই_${d.id}.ai`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast(`✅ Adobe Illustrator (.ai) ফাইল সফলভাবে ডাউনলোড হয়েছে! ইলাস্ট্রেটরে লেখার সাইজ ইচ্ছামতো পরিবর্তন করতে পারবেন।`);
+                } else {
+                    const svgData = buildIllustratorSVGData({
+                        widthPt: w_pt,
+                        heightPt: h_pt,
+                        shopName,
+                        propName,
+                        founderName,
+                        address,
+                        mobile,
+                        goodsDesc,
+                        fontScale,
+                        themeName: d.name
+                    });
+
+                    const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `মেসার্স_আলেয়া_ট্রেডার্স_মুদি_ও_বাকির_পাস_বই_${d.id}_illustrator.svg`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast(`✅ ইলাস্ট্রেটর ভেক্টর (.svg) ডাউনলোড হয়েছে! Adobe Illustrator-এ ওপেন করে লেখার সাইজ ছোট-বড় ও এডিট করতে পারবেন।`);
+                }
+            } catch (err) {
+                console.error('Illustrator Export Error:', err);
+                showToast('❌ ইলাস্ট্রেটর ফাইল তৈরিতে ত্রুটি দেখা দিয়েছে');
+            }
+        }
+
+        function buildAdobeIllustratorData(p) {
+            const w = p.widthPt;
+            const h = p.heightPt;
+            const fs = p.fontScale || 1.0;
+
+            function toHex(str) {
+                let hex = '';
+                for (let i = 0; i < str.length; i++) {
+                    const code = str.charCodeAt(i);
+                    hex += code.toString(16).padStart(4, '0');
+                }
+                return '<FEFF' + hex.toUpperCase() + '>';
+            }
+
+            const lines = [];
+            lines.push("q");
+            lines.push("1 1 1 rg");
+            lines.push(`0 0 ${w} ${h} re f`);
+
+            // Borders
+            const m = 12;
+            lines.push("0.05 0.19 0.36 RG");
+            lines.push("2.5 w");
+            lines.push(`${m} ${m} ${w - m * 2} ${h - m * 2} re S`);
+
+            const in_m = m + 4;
+            lines.push("0.85 0.65 0.13 RG");
+            lines.push("0.8 w");
+            lines.push(`${in_m} ${in_m} ${w - in_m * 2} ${h - in_m * 2} re S`);
+
+            // Signboard Header Box
+            const sb_w = w - 40;
+            const sb_h = 75;
+            const sb_x = 20;
+            const sb_y = h - 135;
+            lines.push("0.05 0.19 0.36 rg");
+            lines.push(`${sb_x} ${sb_y} ${sb_w} ${sb_h} re f`);
+            lines.push("0.95 0.80 0.25 RG");
+            lines.push("1.5 w");
+            lines.push(`${sb_x} ${sb_y} ${sb_w} ${sb_h} re S`);
+            lines.push("Q");
+
+            // Live Type Layers (Text size adjustable in Illustrator Character panel)
+            const tSize1 = Math.round(22 * fs * 10) / 10;
+            lines.push("BT");
+            lines.push(`/F1 ${tSize1} Tf`);
+            lines.push("0.98 0.85 0.25 rg");
+            lines.push(`30 ${sb_y + 45} Td`);
+            lines.push(`${toHex(p.shopName)} Tj`);
+            lines.push("ET");
+
+            const tSize2 = Math.round(11 * fs * 10) / 10;
+            lines.push("BT");
+            lines.push(`/F2 ${tSize2} Tf`);
+            lines.push("1 1 1 rg");
+            lines.push(`35 ${sb_y + 26} Td`);
+            lines.push(`${toHex(p.propName)} Tj`);
+            lines.push("ET");
+
+            const tSize3 = Math.round(9.5 * fs * 10) / 10;
+            lines.push("BT");
+            lines.push(`/F2 ${tSize3} Tf`);
+            lines.push("0.9 0.9 0.9 rg");
+            lines.push(`35 ${sb_y + 11} Td`);
+            lines.push(`${toHex(p.founderName)} Tj`);
+            lines.push("ET");
+
+            // Badge
+            const badge_w = 160;
+            const badge_h = 30;
+            const badge_x = (w - badge_w) / 2;
+            const badge_y = sb_y - 42;
+            lines.push("q");
+            lines.push("0.0 0.53 0.66 rg");
+            lines.push(`${badge_x} ${badge_y} ${badge_w} ${badge_h} re f`);
+            lines.push("1 1 1 RG");
+            lines.push("1.2 w");
+            lines.push(`${badge_x} ${badge_y} ${badge_w} ${badge_h} re S`);
+            lines.push("Q");
+
+            const tSize4 = Math.round(14 * fs * 10) / 10;
+            lines.push("BT");
+            lines.push(`/F1 ${tSize4} Tf`);
+            lines.push("1 1 1 rg");
+            lines.push(`${badge_x + 35} ${badge_y + 9} Td`);
+            lines.push(`${toHex('বাকির পাস বই')} Tj`);
+            lines.push("ET");
+
+            // Address & Mobile
+            const tSize5 = Math.round(9.5 * fs * 10) / 10;
+            lines.push("BT");
+            lines.push(`/F2 ${tSize5} Tf`);
+            lines.push("0.1 0.1 0.1 rg");
+            lines.push(`25 ${badge_y - 30} Td`);
+            lines.push(`${toHex('ঠিকানা: ' + p.address)} Tj`);
+            lines.push("0 -16 Td");
+            lines.push(`${toHex('মোবাইল: ' + p.mobile)} Tj`);
+            lines.push("ET");
+
+            // Decorative separator line
+            lines.push("q");
+            lines.push("0.85 0.65 0.13 RG");
+            lines.push("1.2 w");
+            lines.push(`${w/2 - 50} ${badge_y - 75} m ${w/2 + 50} ${badge_y - 75} l S`);
+            lines.push("Q");
+
+            const contentStream = lines.join("\n");
+            const streamLen = contentStream.length;
+
+            const objects = [];
+            objects.push("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj");
+            objects.push("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj");
+            objects.push(`3 0 obj\n<<\n  /Type /Page\n  /Parent 2 0 R\n  /MediaBox [0 0 ${w} ${h}]\n  /Resources <<\n    /Font <<\n      /F1 <<\n        /Type /Font\n        /Subtype /Type0\n        /BaseFont /NotoSansBengali-Bold\n        /Encoding /Identity-H\n        /DescendantFonts [5 0 R]\n      >>\n      /F2 <<\n        /Type /Font\n        /Subtype /Type0\n        /BaseFont /NotoSansBengali-Regular\n        /Encoding /Identity-H\n        /DescendantFonts [6 0 R]\n      >>\n    >>\n  >>\n  /Contents 4 0 R\n>>\nendobj`);
+            objects.push(`4 0 obj\n<< /Length ${streamLen} >>\nstream\n${contentStream}\nendstream\nendobj`);
+            objects.push(`5 0 obj\n<<\n  /Type /Font\n  /Subtype /CIDFontType0\n  /BaseFont /NotoSansBengali-Bold\n  /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >>\n>>\nendobj`);
+            objects.push(`6 0 obj\n<<\n  /Type /Font\n  /Subtype /CIDFontType0\n  /BaseFont /NotoSansBengali-Regular\n  /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >>\n>>\nendobj`);
+
+            const header = "%PDF-1.5\n%Adobe-Illustrator-Artwork\n";
+            let body = "";
+            const offsets = [];
+            let currentOffset = header.length;
+
+            for (let i = 0; i < objects.length; i++) {
+                offsets.push(currentOffset);
+                const objStr = objects[i] + "\n";
+                body += objStr;
+                currentOffset += objStr.length;
+            }
+
+            const xrefOffset = currentOffset;
+            let xref = `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+            for (let i = 0; i < offsets.length; i++) {
+                xref += String(offsets[i]).padStart(10, '0') + " 00000 n \n";
+            }
+
+            const trailer = `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
+            return header + body + xref + trailer;
+        }
+
+        function buildIllustratorSVGData(p) {
+            const w = p.widthPt;
+            const h = p.heightPt;
+            const fs = p.fontScale || 1.0;
+
+            function esc(s) {
+                return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            }
+
+            const titleSize = Math.round(22 * fs * 10) / 10;
+            const propSize = Math.round(11 * fs * 10) / 10;
+            const founderSize = Math.round(9.5 * fs * 10) / 10;
+            const badgeSize = Math.round(14 * fs * 10) / 10;
+            const normalSize = Math.round(9.5 * fs * 10) / 10;
+            const boldSize = Math.round(10.5 * fs * 10) / 10;
+
+            return `<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator Compatible Passbook Vector Engine -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:ai="http://ns.adobe.com/AdobeIllustrator/10.0/"
+     x="0px" y="0px" width="${w}pt" height="${h}pt" viewBox="0 0 ${w} ${h}"
+     style="enable-background:new 0 0 ${w} ${h};" xml:space="preserve">
+<style type="text/css">
+    .ai-bg{fill:#FFFFFF;}
+    .ai-navy-stroke{fill:none;stroke:#0D315C;stroke-width:2.5;stroke-miterlimit:10;}
+    .ai-gold-stroke{fill:none;stroke:#D4AF37;stroke-width:1;stroke-miterlimit:10;}
+    .ai-signboard{fill:#0D315C;stroke:#F5D372;stroke-width:1.5;}
+    .ai-badge-fill{fill:#0088A9;stroke:#FFFFFF;stroke-width:1.2;}
+    .ai-text-gold{font-family:'Noto Serif Bengali','Tiro Bangla','Hind Siliguri',sans-serif;font-weight:bold;font-size:${titleSize}pt;fill:#FCD34D;}
+    .ai-text-white{font-family:'Hind Siliguri','Anek Bangla',sans-serif;font-weight:600;font-size:${propSize}pt;fill:#FFFFFF;}
+    .ai-text-founder{font-family:'Hind Siliguri','Anek Bangla',sans-serif;font-size:${founderSize}pt;fill:#FDF6B2;}
+    .ai-text-badge{font-family:'Noto Serif Bengali','Galada',serif;font-weight:bold;font-size:${badgeSize}pt;fill:#FFFFFF;}
+    .ai-text-body{font-family:'Hind Siliguri','Noto Sans Bengali',sans-serif;font-size:${normalSize}pt;fill:#1E293B;}
+    .ai-text-bold{font-family:'Hind Siliguri','Noto Sans Bengali',sans-serif;font-weight:bold;font-size:${boldSize}pt;fill:#0D315C;}
+</style>
+<g id="Background_Layer" ai:layer="Background">
+    <rect class="ai-bg" width="${w}" height="${h}"/>
+</g>
+<g id="Borders_and_Security" ai:layer="Borders">
+    <rect x="12" y="12" class="ai-navy-stroke" width="${w - 24}" height="${h - 24}"/>
+    <rect x="16" y="16" class="ai-gold-stroke" width="${w - 32}" height="${h - 32}"/>
+    <!-- Ornamental Corner Marks -->
+    <circle cx="16" cy="16" r="3" fill="#D4AF37"/>
+    <circle cx="${w - 16}" cy="16" r="3" fill="#D4AF37"/>
+    <circle cx="16" cy="${h - 16}" r="3" fill="#D4AF37"/>
+    <circle cx="${w - 16}" cy="${h - 16}" r="3" fill="#D4AF37"/>
+</g>
+<g id="Signboard_Header" ai:layer="Signboard">
+    <rect x="22" y="32" class="ai-signboard" width="${w - 44}" height="76" rx="6" ry="6"/>
+    <!-- Bismillah Sub -->
+    <text x="${w / 2}" y="48" text-anchor="middle" font-size="${founderSize}pt" fill="#FFFFFF" font-family="'Hind Siliguri',sans-serif">বিসমিল্লাহির রাহমানির রাহিম</text>
+    <!-- Shop Title (Editable Live Text in Illustrator) -->
+    <text x="${w / 2}" y="74" text-anchor="middle" class="ai-text-gold">${esc(p.shopName)}</text>
+    <!-- Proprietor -->
+    <text x="${w / 2}" y="93" text-anchor="middle" class="ai-text-white">${esc(p.propName)}</text>
+    <!-- Founder -->
+    <text x="${w / 2}" y="104" text-anchor="middle" class="ai-text-founder">${esc(p.founderName)}</text>
+</g>
+<g id="Passbook_Badge" ai:layer="Badge">
+    <rect x="${(w - 170) / 2}" y="118" class="ai-badge-fill" width="170" height="32" rx="16" ry="16"/>
+    <text x="${w / 2}" y="140" text-anchor="middle" class="ai-text-badge">বাকির পাস বই</text>
+</g>
+<g id="Details_and_Contacts" ai:layer="Editable_Text_Details">
+    <!-- Goods Description -->
+    <text x="${w / 2}" y="170" text-anchor="middle" class="ai-text-body" font-style="italic">${esc(p.goodsDesc)}</text>
+    <!-- Address & Mobile -->
+    <rect x="24" y="${h - 55}" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1" width="${w - 48}" height="38" rx="4" ry="4"/>
+    <text x="32" y="${h - 38}" class="ai-text-bold">দোকানের অবস্থানঃ ${esc(p.address)}</text>
+    <text x="32" y="${h - 24}" class="ai-text-bold">মোবাইলঃ ${esc(p.mobile)}</text>
+</g>
+<g id="Customer_and_KYC" ai:layer="Customer_Fields">
+    <rect x="24" y="${h - 130}" fill="#FFFFFF" stroke="#0D315C" stroke-width="1" width="${w - 48}" height="65" rx="4" ry="4"/>
+    <text x="32" y="${h - 112}" class="ai-text-body">গ্রাহকের নামঃ .................................................................................</text>
+    <text x="32" y="${h - 94}" class="ai-text-body">বই নং / হিসাব নংঃ ...................................................................</text>
+    <text x="32" y="${h - 76}" class="ai-text-body">গ্রাম / এলাকাঃ .................................................................................</text>
+</g>
+</svg>`;
+        }
+
 
         async function downloadPSDFile() {
             showToast('🎨 ফটোশপ (PSD) ফাইল তৈরি হচ্ছে (300 DPI আল্ট্রা-এইচডি)...');
