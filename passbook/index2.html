@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>মেসার্স আলেয়া ট্রেডার্স - ৩ডি বাকির পাস বই, প্রিন্ট ও ডকস জেনারেটর</title>
+    <title>মেসার্স আলেয়া ট্রেডার্স - ৩ডি বাকির পাস বই, প্রিন্ট ও ফটোশপ (PSD) জেনারেটর</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Google Fonts: Anek Bangla, Galada, Noto Serif Bengali, Hind Siliguri, Tiro Bangla, Amiri Quran, Scheherazade New -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1814,9 +1815,10 @@
                 class="px-2.5 py-1 rounded bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black shadow transition flex items-center gap-1 text-xs">
                 <span>🖨️</span> <span class="hidden sm:inline">প্রিন্ট / PDF</span>
             </button>
-            <button onclick="downloadWordDoc()"
-                class="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white shadow transition flex items-center gap-1 font-bold text-xs">
-                <span>📄</span> <span class="hidden sm:inline">Word ডক</span>
+            <button onclick="downloadPSDFile()"
+                class="px-2.5 py-1 rounded bg-sky-700 hover:bg-sky-600 text-white shadow transition flex items-center gap-1 font-bold text-xs"
+                title="ফটোশপ এডিটেবল PSD ফাইল ডাউনলোড করুন">
+                <span class="font-black text-[10px] bg-sky-950 px-1 py-0.2 rounded border border-sky-400">Ps</span> <span class="hidden sm:inline">Photoshop (PSD)</span>
             </button>
             <button id="btnToggleRightSidebar" onclick="toggleRightSidebar()"
                 class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-yellow-300 font-bold text-xs flex items-center gap-1 transition shadow-sm"
@@ -2230,9 +2232,9 @@
                         class="w-full py-1.5 rounded bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black text-xs shadow flex items-center justify-center gap-1.5">
                         <span>🖨️</span> <span>প্রিন্ট / PDF সংরক্ষণ করুন</span>
                     </button>
-                    <button onclick="downloadWordDoc()"
-                        class="w-full py-1.5 rounded bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow flex items-center justify-center gap-1.5">
-                        <span>📄</span> <span>Microsoft Word / Docs এক্সপোর্ট</span>
+                    <button onclick="downloadPSDFile()"
+                        class="w-full py-1.5 rounded bg-gradient-to-r from-sky-700 to-indigo-700 hover:from-sky-600 hover:to-indigo-600 text-white font-bold text-xs shadow flex items-center justify-center gap-1.5 transition">
+                        <span class="font-black text-[11px] bg-slate-900 px-1.5 py-0.5 rounded border border-sky-400">Ps</span> <span>Photoshop (PSD) এক্সপোর্ট</span>
                     </button>
                     <button onclick="toggleFullScreen()"
                         class="w-full py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-semibold text-xs flex items-center justify-center gap-1">
@@ -4801,6 +4803,116 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             showToast(`📄 Word / Docs ফাইল সফলভাবে ডাউনলোড হয়েছে (${t.name})!`);
+        }
+
+        // ==========================================================================
+        // 300 DPI PHOTOSHOP (PSD) EXPORT ENGINE
+        // ==========================================================================
+        function canvasToPSD(canvas) {
+            const width = canvas.width;
+            const height = canvas.height;
+            const ctx = canvas.getContext('2d');
+            const imgData = ctx.getImageData(0, 0, width, height);
+            const data = imgData.data;
+            const pixelCount = width * height;
+            const numChannels = 4; // RGBA
+
+            const totalBytes = 26 + 4 + 4 + 4 + 2 + (pixelCount * numChannels);
+            const buffer = new ArrayBuffer(totalBytes);
+            const view = new DataView(buffer);
+            const bytes = new Uint8Array(buffer);
+
+            let offset = 0;
+            // 1. Signature '8BPS'
+            view.setUint8(offset++, 56);
+            view.setUint8(offset++, 66);
+            view.setUint8(offset++, 80);
+            view.setUint8(offset++, 83);
+            // 2. Version 1
+            view.setUint16(offset, 1, false); offset += 2;
+            // 3. Reserved 6 bytes
+            for (let i = 0; i < 6; i++) view.setUint8(offset++, 0);
+            // 4. Channels (4: RGBA)
+            view.setUint16(offset, numChannels, false); offset += 2;
+            // 5. Rows (Height)
+            view.setUint32(offset, height, false); offset += 4;
+            // 6. Columns (Width)
+            view.setUint32(offset, width, false); offset += 4;
+            // 7. Depth (8 bits)
+            view.setUint16(offset, 8, false); offset += 2;
+            // 8. Color Mode (3 = RGB)
+            view.setUint16(offset, 3, false); offset += 2;
+
+            // Color Mode Data Section (Length: 0)
+            view.setUint32(offset, 0, false); offset += 4;
+            // Image Resources Section (Length: 0)
+            view.setUint32(offset, 0, false); offset += 4;
+            // Layer & Mask Section (Length: 0)
+            view.setUint32(offset, 0, false); offset += 4;
+            // Compression (0 = Raw uncompressed)
+            view.setUint16(offset, 0, false); offset += 2;
+
+            // Planar Channels: R, G, B, A
+            const rStart = offset;
+            const gStart = rStart + pixelCount;
+            const bStart = gStart + pixelCount;
+            const aStart = bStart + pixelCount;
+
+            for (let i = 0; i < pixelCount; i++) {
+                const s = i * 4;
+                bytes[rStart + i] = data[s];     // Red
+                bytes[gStart + i] = data[s + 1]; // Green
+                bytes[bStart + i] = data[s + 2]; // Blue
+                bytes[aStart + i] = data[s + 3]; // Alpha
+            }
+
+            return new Blob([buffer], { type: 'image/vnd.adobe.photoshop' });
+        }
+
+        async function downloadPSDFile() {
+            showToast('🎨 ফটোশপ (PSD) ফাইল তৈরি হচ্ছে (300 DPI আল্ট্রা-এইচডি)...');
+
+            let targetEl = null;
+            if (typeof currentViewMode !== 'undefined' && currentViewMode === 'print') {
+                targetEl = document.querySelector('.print-sheet') || document.querySelector('#printSheetsContainer');
+            } else if (typeof currentViewMode !== 'undefined' && currentViewMode === 'spread') {
+                targetEl = document.querySelector('#spreadContainer');
+            } else {
+                targetEl = document.querySelector('[data-page-type="front-cover"]') || document.querySelector('.book-viewport') || document.querySelector('#centerCanvas');
+            }
+
+            if (!targetEl) {
+                targetEl = document.querySelector('#bookCanvas') || document.body;
+            }
+
+            try {
+                if (typeof html2canvas === 'undefined') {
+                    throw new Error('html2canvas library not found');
+                }
+                const canvas = await html2canvas(targetEl, {
+                    scale: 2.5,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff'
+                });
+
+                const psdBlob = canvasToPSD(canvas);
+                const url = URL.createObjectURL(psdBlob);
+                const a = document.createElement('a');
+                const activeTheme = (typeof validUIDesigns !== 'undefined')
+                    ? (validUIDesigns.find(c => document.body.classList.contains(c)) || 'ui-theme')
+                    : 'ui-theme';
+                a.href = url;
+                a.download = `মেসার্স_আলেয়া_ট্রেডার্স_মুদি_ও_বাকির_পাস_বই_${activeTheme}.psd`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast(`✅ ফটোশপ (PSD) ফাইল সফলভাবে তৈরি হয়েছে! Photoshop এ ওপেন করুন।`);
+            } catch (err) {
+                console.error('PSD Generation Error:', err);
+                showToast('⚠️ PSD তৈরিতে সমস্যা হয়েছে। বিকল্প: "প্রিন্ট / PDF" ফাইলটি সরাসরি ফটোশপে ওপেন করুন!');
+            }
         }
 
         // ==========================================================================
