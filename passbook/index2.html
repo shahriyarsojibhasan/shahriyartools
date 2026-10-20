@@ -80,7 +80,83 @@
             margin-bottom: 3px !important;
         }
 
-    </style>
+    
+        /* -------------------------------------------------------------
+           FONT SCALE & ULTRA SHARP PRINT ENHANCEMENTS
+           ------------------------------------------------------------- */
+        :root {
+            --font-scale: 1.0;
+        }
+
+        .passbook-page {
+            font-size: calc(12px * var(--font-scale, 1.0));
+        }
+
+        .ledger-table th {
+            font-size: calc(8pt * var(--font-scale, 1.0)) !important;
+        }
+
+        .ledger-table td {
+            font-size: calc(8.5pt * var(--font-scale, 1.0)) !important;
+        }
+
+        .signboard-title {
+            font-size: calc(20pt * var(--font-scale, 1.0)) !important;
+        }
+
+        .inside-rules-box,
+        .inside-profile-box {
+            font-size: calc(11px * var(--font-scale, 1.0));
+        }
+
+        /* Super Sharp / Deep Ink Offset Print Mode */
+        body.deep-ink-mode .passbook-page,
+        body.deep-ink-mode .print-sheet,
+        body.deep-ink-mode .book-leaf {
+            -webkit-font-smoothing: antialiased;
+            text-rendering: geometricPrecision;
+            filter: contrast(1.18);
+        }
+
+        body.deep-ink-mode .ledger-table {
+            border-color: #000000 !important;
+            border-width: 2px !important;
+        }
+
+        body.deep-ink-mode .ledger-table th {
+            color: #000000 !important;
+            border-color: #000000 !important;
+            font-weight: 900 !important;
+        }
+
+        body.deep-ink-mode .ledger-table td {
+            color: #000000 !important;
+            border-color: #1e293b !important;
+            font-weight: 700 !important;
+        }
+
+        body.deep-ink-mode .passbook-page-inner {
+            border-color: #000000 !important;
+        }
+
+        body.deep-ink-mode .inside-rules-box,
+        body.deep-ink-mode .inside-profile-box {
+            border-color: #000000 !important;
+            box-shadow: none !important;
+        }
+
+        body.deep-ink-mode .qr-box-square {
+            border-color: #000000 !important;
+            border-width: 2px !important;
+        }
+
+        /* Print Sheet Scaler Transition */
+        #print-sheets-scaler {
+            transition: transform 0.15s ease-out;
+            transform-origin: top center;
+        }
+
+</style>
 
     <style>
         :root {
@@ -2060,6 +2136,33 @@
                         <option value="solaiman">১১. সোলাইমানলিপি / কালপুরুষ (প্রমিত বাংলা)</option>
                     </select>
                 </div>
+
+                    <!-- Font Size Adjuster Tool -->
+                    <div class="mt-2.5 pt-2 border-t border-slate-700/80">
+                        <div class="flex items-center justify-between text-[10.5px] font-semibold text-slate-300 mb-1">
+                            <span>🔤 লেখার সাইজ / ফন্ট স্কেল:</span>
+                            <span id="fontScaleBadge" class="text-[10px] font-mono text-yellow-300 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-700">100%</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="adjustPassbookFontScale(-0.04)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 cursor-pointer" title="লেখা ছোট করুন">A-</button>
+                            <input type="range" id="fontScaleSlider" min="0.80" max="1.30" step="0.02" value="1.0"
+                                oninput="setPassbookFontScale(parseFloat(this.value))"
+                                class="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-yellow-400" />
+                            <button type="button" onclick="adjustPassbookFontScale(0.04)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 cursor-pointer" title="লেখা বড় করুন">A+</button>
+                            <button type="button" onclick="setPassbookFontScale(1.0)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[9.5px] text-amber-300 border border-slate-700 cursor-pointer" title="১০০% স্বাভাবিক সাইজে রিসেট">১০০%</button>
+                        </div>
+                    </div>
+
+                    <!-- Super Sharp / Deep Ink Mode Toggle -->
+                    <div class="mt-2 pt-1.5 border-t border-slate-700/60">
+                        <button type="button" onclick="toggleDeepInkMode()"
+                            class="w-full py-1.5 px-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-bold text-xs flex items-center justify-between gap-1 shadow-sm transition cursor-pointer"
+                            title="প্রিন্টে লেখা ও বর্ডার আরো গাঢ় এবং ক্রিস্প করতে ডিপ ইনক সক্রিয় করুন">
+                            <span class="flex items-center gap-1.5"><span>🎚️</span> <span>সুপার শার্প প্রিন্ট মোড:</span></span>
+                            <span id="deepInkBadge" class="px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-600 font-bold text-[10.5px]">বন্ধ</span>
+                        </button>
+                    </div>
+
             </div>
 
             <!-- Section 4: Rows, Margin & Page Format Settings -->
@@ -2157,20 +2260,100 @@
             </section>
 
             <!-- 2. DYNAMIC PRINT SHEETS VIEWPORT -->
+            
+            <!-- 2. DYNAMIC PRINT SHEETS VIEWPORT -->
             <section id="print-sheets-view" class="w-full flex flex-col items-center justify-start">
-                <div
-                    class="no-print mb-3 max-w-2xl w-full bg-emerald-950/90 border border-emerald-500/50 rounded-xl px-3 py-1.5 text-xs text-emerald-100 flex items-center justify-between gap-2 shadow-lg">
-                    <div>
-                        <strong>🖨️ প্রিন্ট শিট ভিউ:</strong> প্রতিটি পাতার মাঝখানে ভাঁজ ও কাটার দাগ রয়েছে।
+                <!-- PRINT SHEET POWER SUITE TOOLBAR -->
+                <div class="no-print mb-4 w-full max-w-5xl bg-slate-900/95 backdrop-blur-md border border-emerald-500/60 rounded-2xl p-3 shadow-2xl text-white">
+                    <!-- Top Row: Title, Page/Sheet Counter, Direct Print & View Switchers -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-700/80">
+                        <div class="flex items-center gap-2">
+                            <span class="p-1.5 rounded-lg bg-emerald-600/30 border border-emerald-500/50 text-emerald-300 text-base">🖨️</span>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-extrabold text-sm text-yellow-300">প্রিন্ট শিট পাওয়ার স্যুট (Print Multi-Tools)</span>
+                                    <span id="sheetCountBadge" class="px-2 py-0.5 rounded-full bg-emerald-950 border border-emerald-500 text-emerald-300 font-mono text-[11px] font-bold">১০ পৃষ্ঠা (৫টি শিট)</span>
+                                </div>
+                                <p class="text-[10.5px] text-slate-300">A4 বা নির্দিষ্ট সাইজের কাগজে নিখুঁত অফসেট ও ডাবল-সাইডেড প্রিন্ট প্রস্তুত</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="triggerPrintBook()"
+                                class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 font-black text-xs shadow-lg flex items-center gap-1.5 transition transform active:scale-95 cursor-pointer">
+                                <span>🖨️</span> <span>প্রিন্ট / PDF সংরক্ষণ (Ctrl+P)</span>
+                            </button>
+                            <div class="flex items-center gap-1 bg-slate-800/80 p-0.5 rounded-lg border border-slate-700">
+                                <button onclick="switchViewMode('spread')" class="px-2.5 py-1 rounded-md text-slate-300 hover:text-white text-xs font-semibold cursor-pointer">২-পাতা স্প্রেড</button>
+                                <button onclick="switchViewMode('3d')" class="px-2.5 py-1 rounded-md text-slate-300 hover:text-white text-xs font-semibold cursor-pointer">৩ডি বই</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="switchViewMode('spread')"
-                            class="px-2.5 py-0.5 rounded bg-sky-600 text-white font-bold text-xs">২-পাতা
-                            স্প্রেড</button>
-                        <button onclick="switchViewMode('3d')"
-                            class="px-2.5 py-0.5 rounded bg-yellow-400 text-slate-950 font-bold text-xs">৩ডি বই</button>
+
+                    <!-- Bottom Row: Multi-Tool Actions Bar -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2 pt-2.5 text-xs">
+                        <!-- Tool 1: 1-Click Quick Data Edit -->
+                        <div class="bg-slate-800/70 border border-slate-700/80 rounded-xl p-2 flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-amber-300 font-bold text-[11px] flex items-center gap-1"><span>⚡</span> ১-ক্লিকে তথ্য এডিট</span>
+                                <span class="text-[9.5px] bg-amber-950 text-amber-300 px-1.5 rounded">লাইভ সিঙ্ক</span>
+                            </div>
+                            <button onclick="openQuickDataModal()"
+                                class="w-full py-1.5 px-2 rounded-lg bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white font-bold text-[11px] shadow flex items-center justify-center gap-1.5 transition cursor-pointer">
+                                <span>📝</span> <span>দোকান ও গ্রাহক তথ্য বদলান</span>
+                            </button>
+                        </div>
+
+                        <!-- Tool 2: Font Scale Adjuster -->
+                        <div class="bg-slate-800/70 border border-slate-700/80 rounded-xl p-2 flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sky-300 font-bold text-[11px] flex items-center gap-1"><span>🔤</span> ফন্ট সাইজ অ্যাডজাস্টার</span>
+                                <span id="sheetFontScaleBadge" class="text-[10px] font-mono text-yellow-300 bg-slate-900 px-1.5 py-0.2 rounded border border-slate-700">100%</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="adjustPassbookFontScale(-0.04)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs cursor-pointer" title="লেখা ছোট করুন">A-</button>
+                                <input type="range" id="sheetFontScaleSlider" min="0.80" max="1.30" step="0.02" value="1.0"
+                                    oninput="setPassbookFontScale(parseFloat(this.value))"
+                                    class="w-full h-1.5 bg-slate-950 rounded-lg appearance-none cursor-pointer accent-sky-400" />
+                                <button onclick="adjustPassbookFontScale(0.04)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs cursor-pointer" title="লেখা বড় করুন">A+</button>
+                                <button onclick="setPassbookFontScale(1.0)" class="px-1.5 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-[10px] text-slate-300 border border-slate-700 cursor-pointer" title="১০০% স্বাভাবিক রিসেট">১০০%</button>
+                            </div>
+                        </div>
+
+                        <!-- Tool 3: Super Sharp & Deep Ink Print Mode -->
+                        <div class="bg-slate-800/70 border border-slate-700/80 rounded-xl p-2 flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-emerald-300 font-bold text-[11px] flex items-center gap-1"><span>🎚️</span> সুপার শার্প প্রিন্ট</span>
+                                <span id="sheetDeepInkBadge" class="px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-600 font-bold text-[9.5px]">বন্ধ</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1">
+                                <button onclick="toggleDeepInkMode()"
+                                    class="py-1 px-1.5 rounded-lg bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 font-bold text-[10.5px] border border-emerald-600/60 transition cursor-pointer flex items-center justify-center gap-1">
+                                    <span>✨</span> <span>ডিপ ইনক</span>
+                                </button>
+                                <button onclick="toggleFoldCutLine()"
+                                    class="py-1 px-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-[10.5px] border border-slate-600 transition cursor-pointer flex items-center justify-center gap-1"
+                                    title="মাঝের ভাঁজ ও কাটিং দাগ অন/অফ">
+                                    <span>✂️</span> <span>কাটিং দাগ</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tool 4: Sheet View Zoom & Fit -->
+                        <div class="bg-slate-800/70 border border-slate-700/80 rounded-xl p-2 flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-yellow-300 font-bold text-[11px] flex items-center gap-1"><span>🔍</span> শিট ভিউ জুম</span>
+                                <span id="sheetZoomLabel" class="text-[10px] font-mono text-yellow-300 bg-slate-900 px-1.5 py-0.2 rounded border border-slate-700">অটো ফিট</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button onclick="adjustPrintSheetZoom(-0.1)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs cursor-pointer" title="জুম আউট">-</button>
+                                <button onclick="setPrintSheetFitMode()" class="flex-1 py-0.5 rounded bg-slate-900 hover:bg-slate-800 text-[10px] text-amber-300 border border-slate-700 font-bold cursor-pointer" title="স্ক্রিনের প্রস্থ অনুযায়ী অটো ফিট">ফিট স্ক্রিন</button>
+                                <button onclick="adjustPrintSheetZoom(0.1)" class="px-2 py-0.5 rounded bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs cursor-pointer" title="জুম ইন">+</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
                 <div id="print-sheets-scaler" class="w-full">
                     <div id="printSheetsContainer" data-alias="print-sheets-container"></div>
                 </div>
@@ -2318,7 +2501,119 @@
     <!-- =========================================================================================
          MODAL 1: 10 UNIQUE UI DESIGNS GALLERY MODAL
          ========================================================================================= -->
-    <div id="uiGalleryModal"
+    
+    <!-- =========================================================================================
+         MODAL: 1-CLICK QUICK BUSINESS DATA & CUSTOMER EDITOR MODAL
+         ========================================================================================= -->
+    <div id="quickDataModal"
+        class="no-print fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-3">
+        <div
+            class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl text-white">
+            <!-- Header -->
+            <div class="px-5 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-950/60 rounded-t-2xl">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">⚡</span>
+                    <div>
+                        <h2 class="text-base font-bold text-yellow-300">১-ক্লিকে দোকান ও বইয়ের তথ্য পরিবর্তন (Quick Data Editor)</h2>
+                        <p class="text-xs text-slate-400">প্রিসেট নির্বাচন করুন অথবা নিচের ঘরে লিখে এক ক্লিকে সব পাতায় লাইভ আপডেট করুন</p>
+                    </div>
+                </div>
+                <button onclick="closeQuickDataModal()"
+                    class="w-8 h-8 rounded-full bg-slate-800 hover:bg-rose-900 text-slate-300 hover:text-white flex items-center justify-center font-bold text-sm cursor-pointer transition">✕</button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-5 overflow-y-auto space-y-4">
+                <!-- 1-Click Business Presets -->
+                <div>
+                    <label class="block text-xs font-bold text-emerald-400 mb-1.5">⚡ ১-ক্লিকে জনপ্রিয় ব্যবসার প্রিসেট নির্বাচন করুন:</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        <button type="button" onclick="applyShopPreset('grocer')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-emerald-600/60 text-left transition cursor-pointer hover:border-emerald-400">
+                            <div class="font-bold text-xs text-yellow-300">🌾 মুদি ও সার-বীজ</div>
+                            <div class="text-[10px] text-slate-400 truncate">মেসার্স আলেয়া ট্রেডার্স</div>
+                        </button>
+                        <button type="button" onclick="applyShopPreset('general')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-sky-600/60 text-left transition cursor-pointer hover:border-sky-400">
+                            <div class="font-bold text-xs text-sky-300">🛒 জেনারেল স্টোর</div>
+                            <div class="text-[10px] text-slate-400 truncate">আল-আমিন জেনারেল স্টোর</div>
+                        </button>
+                        <button type="button" onclick="applyShopPreset('pharmacy')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-rose-600/60 text-left transition cursor-pointer hover:border-rose-400">
+                            <div class="font-bold text-xs text-rose-300">💊 ফার্মেসী ও ড্রাগ</div>
+                            <div class="text-[10px] text-slate-400 truncate">বিসমিল্লাহ ফার্মেসী</div>
+                        </button>
+                        <button type="button" onclick="applyShopPreset('telecom')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-purple-600/60 text-left transition cursor-pointer hover:border-purple-400">
+                            <div class="font-bold text-xs text-purple-300">📱 টেলিকম ও এমএফএস</div>
+                            <div class="text-[10px] text-slate-400 truncate">ভাই ভাই টেলিকম</div>
+                        </button>
+                        <button type="button" onclick="applyShopPreset('empty')" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-amber-600/60 text-left transition cursor-pointer hover:border-amber-400">
+                            <div class="font-bold text-xs text-amber-300">🧹 ফাঁকা ফরম্যাট</div>
+                            <div class="text-[10px] text-slate-400 truncate">প্রিন্ট করে কলমে লিখতে</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Form Fields -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800 text-xs">
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-0.5">দোকানের নামঃ</label>
+                        <input type="text" id="quickModalShopName" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-yellow-300 font-bold focus:border-yellow-400 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-0.5">প্রোপ্রাইটর / স্বত্বাধিকারীঃ</label>
+                        <input type="text" id="quickModalPropName" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:border-yellow-400 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-0.5">প্রতিষ্ঠাতাঃ</label>
+                        <input type="text" id="quickModalFounderName" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-amber-200 focus:border-yellow-400 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-0.5">প্রধান মোবাইল নম্বরঃ</label>
+                        <input type="text" id="quickModalMobile" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono focus:border-yellow-400 focus:outline-none" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-slate-300 font-semibold mb-0.5">দোকানের ঠিকানা ও অবস্থানঃ</label>
+                        <input type="text" id="quickModalAddress" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-yellow-300 focus:border-yellow-400 focus:outline-none" />
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-slate-300 font-semibold mb-0.5">বিক্রিত পণ্যের বিবরণ (ফ্রন্ট ও ব্যাক কভারের সারসংক্ষেপ):</label>
+                        <textarea id="quickModalGoodsDesc" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-slate-200 text-xs focus:border-yellow-400 focus:outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-0.5">বিকাশ এজেন্ট নম্বরঃ</label>
+                        <input type="text" id="quickModalBkashAgent" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-pink-300 font-mono focus:border-pink-400 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-0.5">নগদ / পার্সোনাল নম্বরঃ</label>
+                        <input type="text" id="quickModalMfsMain" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-orange-300 font-mono focus:border-orange-400 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-0.5">গ্রাহকের নাম (ঐচ্ছিক):</label>
+                        <input type="text" id="quickModalCustomerName" placeholder="খালি রাখুন বা নাম লিখুন" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white focus:border-yellow-400 focus:outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 font-semibold mb-0.5">বই নং / হিসাব নং (ঐচ্ছিক):</label>
+                        <input type="text" id="quickModalBookNo" placeholder="০১" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-mono focus:border-yellow-400 focus:outline-none" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3 border-t border-slate-800 bg-slate-950/60 rounded-b-2xl flex justify-between items-center">
+                <button type="button" onclick="applyShopPreset('grocer')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition cursor-pointer">
+                    🔄 ডিফল্টে ফিরুন
+                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="closeQuickDataModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition cursor-pointer">
+                        বাতিল
+                    </button>
+                    <button type="button" onclick="saveQuickDataFromModal()" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition cursor-pointer flex items-center gap-1.5">
+                        <span>⚡</span> <span>সকল পেজে প্রয়োগ করুন (Save & Sync)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div id="uiGalleryModal"
         class="no-print fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-3">
         <div
             class="bg-slate-900 border border-slate-700 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl text-white">
@@ -5216,7 +5511,236 @@
             applyBookZoom();
         }
 
+        
+        // -------------------------------------------------------------
+        // FONT SCALE, MULTI-TOOLS & 1-CLICK BUSINESS DATA ENGINE
+        // -------------------------------------------------------------
+        let currentFontScale = 1.0;
+        let isDeepInkMode = false;
+        let printSheetZoom = 1.0;
+        let isPrintSheetFit = true;
+
+        const businessPresets = {
+            grocer: {
+                shopName: 'মেসার্স আলেয়া ট্রেডার্স',
+                propName: 'প্রোঃ মোঃ আশরাফুল ইসলাম',
+                founderName: 'প্রতিষ্ঠাতাঃ মোঃ জয়নাল আবেদীন',
+                address: 'মহিষ্ট্র, কিচক, শিবগঞ্জ, বগুড়া',
+                mobile: '০১৭২৮-৩৬০২৪০',
+                goodsDesc: 'এখানে উন্নত মানের চাল, ডাল, তেল, চিনি, লবণ, আটা-ময়দা, সুজি, যাবতীয় মসলাপাতি, চা-পাতা, বিস্কুট, বেকারি পণ্য, সাবান, ডিটারজেন্ট ও প্রসাধন সামগ্রী সহ সর্বপ্রকার মুদি ও মনিহারী মালামাল এবং উন্নত সার, কীটনাশক ও ধান বীজ সুলভ মূল্যে পাইকারি ও খুচরা বিক্রয় করা হয়।',
+                specialSeed: 'বিঃ দ্রঃ উন্নত মানের বিভিন্ন জাতের ধান বীজ পাওয়া যায়।',
+                bkashAgent: '01771-653770',
+                mfsPersonalMain: '01728-360240',
+                bkashPersonal1: '01706-824144',
+                bkashPersonal2: '01784-905018',
+                bkashPersonal3: '01305-662727'
+            },
+            general: {
+                shopName: 'মেসার্স আল-আমিন জেনারেল স্টোর',
+                propName: 'প্রোঃ মোঃ আল-আমিন খন্দকার',
+                founderName: 'প্রতিষ্ঠাতাঃ হাজী আঃ রহিম',
+                address: 'কলেজ রোড, নতুন বাজার, শিবগঞ্জ, বগুড়া',
+                mobile: '০১৭০০-১২২৩৩৪',
+                goodsDesc: 'এখানে সর্বপ্রকার উন্নত দেশী ও বিদেশী মুদি সামগ্রী, ভোজ্যতেল, গুঁড়াদুধ, কনফেকশনারি, প্যাকেটজাত খাদ্যপণ্য, স্টেশনারি ও নিত্যপ্রয়োজনীয় মালামাল পাইকারি ও খুচরা সুলভ মূল্যে বিক্রয় করা হয়।',
+                specialSeed: 'বিঃ দ্রঃ পাইকারি ক্রেতাদের জন্য বিশেষ কমিশন সুবিধা রয়েছে।',
+                bkashAgent: '01700-112233',
+                mfsPersonalMain: '01700-122334',
+                bkashPersonal1: '01800-223344',
+                bkashPersonal2: '01900-334455',
+                bkashPersonal3: '01300-445566'
+            },
+            pharmacy: {
+                shopName: 'মেসার্স বিসমিল্লাহ ফার্মেসী ও ড্রাগ',
+                propName: 'প্রোঃ ডাঃ মোঃ রফিকুল ইসলাম (ডি.এম.এ)',
+                founderName: 'প্রতিষ্ঠাতাঃ আলহাজ্ব সামছুল হক',
+                address: 'উপজেলা স্বাস্থ্য কমপ্লেক্স গেট সংলগ্ন, শিবগঞ্জ',
+                mobile: '০১৮১২-৩৪৫৬৭৮',
+                goodsDesc: 'এখানে সর্বপ্রকার জীবনরক্ষাকারী দেশী ও বিদেশী ওষুধ, ভ্যাকসিন, সার্জিক্যাল সামগ্রী, শিশুখাদ্য, বেবি ডায়াপার ও নেবুলাইজার সামগ্রী সরকার নির্ধারিত মূল্যে পাওয়া যায়।',
+                specialSeed: 'বিঃ দ্রঃ ২৪ ঘণ্টা জরুরী অক্সিজেন ও প্রাথমিক চিকিৎসা সেবা প্রদান করা হয়।',
+                bkashAgent: '01812-345678',
+                mfsPersonalMain: '01812-345678',
+                bkashPersonal1: '01711-223344',
+                bkashPersonal2: '01911-334455',
+                bkashPersonal3: '01611-445566'
+            },
+            telecom: {
+                shopName: 'মেসার্স ভাই ভাই টেলিকম ও এমএফএস',
+                propName: 'প্রোঃ মোঃ তারেক হাসান',
+                founderName: 'প্রতিষ্ঠাতাঃ মোঃ আনোয়ার হোসেন',
+                address: 'মেইন রোড, স্টেশন বাজার, বগুড়া',
+                mobile: '০১৬৭৮-৯৮৭৬৫৪',
+                goodsDesc: 'বিকাশ, নগদ, রকেট, উপায় ক্যাশ-ইন ক্যাশ-আউট, সর্বপ্রকার সিম কার্ড বিক্রয়, বায়োমেট্রিক রেজিস্ট্রেশন, ফ্লেক্সিলোড, ইন্টারনেট প্যাকেজ ও মোবাইল এক্সেসরিজ বিক্রয় কেন্দ্র।',
+                specialSeed: 'বিঃ দ্রঃ যেকোনো ব্যাংকে তাৎক্ষণিক অর্থ স্থানান্তর করা হয়।',
+                bkashAgent: '01678-987654',
+                mfsPersonalMain: '01678-987654',
+                bkashPersonal1: '01755-667788',
+                bkashPersonal2: '01855-778899',
+                bkashPersonal3: '01955-889900'
+            },
+            empty: {
+                shopName: 'দোকানের নাম লিখুন',
+                propName: 'প্রোঃ স্বত্বাধিকারীর নাম',
+                founderName: 'প্রতিষ্ঠাতাঃ প্রতিষ্ঠাতার নাম',
+                address: 'দোকানের পূর্ণ ঠিকানা',
+                mobile: '০১XXXXXXXXX',
+                goodsDesc: 'এখানে সুলভ মূল্যে পাইকারি ও খুচরা মালামাল বিক্রয় করা হয়।',
+                specialSeed: 'বিঃ দ্রঃ বিশেষ দ্রষ্টব্য লিখুন।',
+                bkashAgent: '০১XXXXXXXXX',
+                mfsPersonalMain: '০১XXXXXXXXX',
+                bkashPersonal1: '০১XXXXXXXXX',
+                bkashPersonal2: '০১XXXXXXXXX',
+                bkashPersonal3: '০১XXXXXXXXX'
+            }
+        };
+
+        function setPassbookFontScale(scale) {
+            currentFontScale = Math.min(1.35, Math.max(0.80, Math.round(scale * 100) / 100));
+            document.documentElement.style.setProperty('--font-scale', currentFontScale);
+            document.documentElement.style.setProperty('--table-font-size', `${Math.round(8.5 * currentFontScale * 10) / 10}pt`);
+
+            // Update sliders & badges
+            ['fontScaleSlider', 'sheetFontScaleSlider'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = currentFontScale;
+            });
+            ['fontScaleBadge', 'sheetFontScaleBadge'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = `${Math.round(currentFontScale * 100)}%`;
+            });
+
+            if (typeof autoAdjustInsideCover === 'function') {
+                setTimeout(autoAdjustInsideCover, 40);
+            }
+        }
+
+        function adjustPassbookFontScale(delta) {
+            setPassbookFontScale(currentFontScale + delta);
+        }
+
+        function toggleDeepInkMode() {
+            isDeepInkMode = !isDeepInkMode;
+            document.body.classList.toggle('deep-ink-mode', isDeepInkMode);
+
+            ['deepInkBadge', 'sheetDeepInkBadge'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerText = isDeepInkMode ? 'চালু' : 'বন্ধ';
+                    el.className = isDeepInkMode
+                        ? 'px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500 font-black text-[10.5px]'
+                        : 'px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-600 font-bold text-[10.5px]';
+                }
+            });
+            showToast(isDeepInkMode ? '🖨️ সুপার শার্প ও ডিপ ইনক মোড চালু হয়েছে (অফসেট কোয়ালিটি)' : 'স্বাভাবিক প্রিন্ট মোড সক্রিয়');
+        }
+
+        function adjustPrintSheetZoom(delta) {
+            isPrintSheetFit = false;
+            printSheetZoom = Math.min(1.5, Math.max(0.35, Math.round((printSheetZoom + delta) * 100) / 100));
+            applyPrintSheetZoom();
+        }
+
+        function setPrintSheetFitMode() {
+            isPrintSheetFit = true;
+            autoFitPrintSheets();
+            const lbl = document.getElementById('sheetZoomLabel');
+            if (lbl) lbl.innerText = 'অটো ফিট';
+        }
+
+        function applyPrintSheetZoom() {
+            const scaler = document.getElementById('print-sheets-scaler');
+            if (scaler) {
+                scaler.style.transform = `scale(${printSheetZoom})`;
+                scaler.style.transformOrigin = 'top center';
+            }
+            const lbl = document.getElementById('sheetZoomLabel');
+            if (lbl) lbl.innerText = `${Math.round(printSheetZoom * 100)}%`;
+        }
+
+        function openQuickDataModal() {
+            populateQuickDataModal();
+            const modal = document.getElementById('quickDataModal');
+            if (modal) modal.classList.remove('hidden');
+        }
+
+        function closeQuickDataModal() {
+            const modal = document.getElementById('quickDataModal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function populateQuickDataModal() {
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val || '';
+            };
+            setVal('quickModalShopName', shopConfig.shopName);
+            setVal('quickModalPropName', shopConfig.propName);
+            setVal('quickModalFounderName', shopConfig.founderName);
+            setVal('quickModalMobile', shopConfig.mobile);
+            setVal('quickModalAddress', shopConfig.address);
+            setVal('quickModalGoodsDesc', shopConfig.goodsDesc);
+            setVal('quickModalBkashAgent', shopConfig.bkashAgent);
+            setVal('quickModalMfsMain', shopConfig.mfsPersonalMain);
+            setVal('quickModalCustomerName', shopConfig.customerName);
+            setVal('quickModalBookNo', shopConfig.bookNo);
+        }
+
+        function applyShopPreset(presetKey) {
+            const p = businessPresets[presetKey];
+            if (!p) return;
+            Object.assign(shopConfig, p);
+            populateQuickDataModal();
+            syncAllInputsFromShopConfig();
+            renderAllPages(isSampleMode);
+            showToast(`⚡ প্রিসেট সফলভাবে প্রয়োগ করা হয়েছে!`);
+        }
+
+        function saveQuickDataFromModal() {
+            const getVal = id => {
+                const el = document.getElementById(id);
+                return el ? el.value.trim() : '';
+            };
+            shopConfig.shopName = getVal('quickModalShopName') || shopConfig.shopName;
+            shopConfig.propName = getVal('quickModalPropName') || shopConfig.propName;
+            shopConfig.founderName = getVal('quickModalFounderName') || shopConfig.founderName;
+            shopConfig.mobile = getVal('quickModalMobile') || shopConfig.mobile;
+            shopConfig.address = getVal('quickModalAddress') || shopConfig.address;
+            shopConfig.goodsDesc = getVal('quickModalGoodsDesc') || shopConfig.goodsDesc;
+            shopConfig.bkashAgent = getVal('quickModalBkashAgent') || shopConfig.bkashAgent;
+            shopConfig.mfsPersonalMain = getVal('quickModalMfsMain') || shopConfig.mfsPersonalMain;
+            shopConfig.customerName = getVal('quickModalCustomerName');
+            shopConfig.bookNo = getVal('quickModalBookNo');
+
+            syncAllInputsFromShopConfig();
+            renderAllPages(isSampleMode);
+            closeQuickDataModal();
+            showToast('⚡ সকল পাতায় তথ্য সফলভাবে আপডেট হয়েছে!');
+        }
+
+        function syncAllInputsFromShopConfig() {
+            Object.keys(shopConfig).forEach(key => {
+                document.querySelectorAll(`[data-sync="${key}"]`).forEach(el => {
+                    el.innerText = shopConfig[key];
+                });
+            });
+
+            const rightSidebar = document.getElementById('rightSidebar');
+            if (rightSidebar) {
+                const inputs = rightSidebar.querySelectorAll('input, textarea');
+                inputs.forEach(inp => {
+                    const oninputAttr = inp.getAttribute('oninput') || '';
+                    const match = oninputAttr.match(/syncFromInput\(['"]([^'"]+)['"]/);
+                    if (match && shopConfig[match[1]] !== undefined) {
+                        inp.value = shopConfig[match[1]];
+                    }
+                });
+            }
+
+            if (typeof syncRibbonInputs === 'function') syncRibbonInputs();
+        }
+
+
         function autoFitPrintSheets() {
+            if (!isPrintSheetFit) return;
             const canvas = document.getElementById('centerCanvas');
             const availableW = canvas ? (canvas.clientWidth - 32) : (window.innerWidth - 32);
             const scaler = document.getElementById('print-sheets-scaler');
