@@ -20,6 +20,23 @@
             size: A4 landscape;
             margin: 0;
         }
+    
+        /* Center Gutter Fold & Cut Line Toggle */
+        body.hide-fold-line .center-gutter,
+        .hide-fold-line .center-gutter {
+            background: transparent !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+        body.hide-fold-line .center-gutter::before,
+        .hide-fold-line .center-gutter::before {
+            display: none !important;
+        }
+        body.hide-fold-line .center-gutter *,
+        .hide-fold-line .center-gutter * {
+            display: none !important;
+        }
+
     </style>
 
     <style>
@@ -1910,6 +1927,14 @@
 
                 <!-- Print Output Mode Selection (Mode A vs Mode B) -->
                 <div class="mt-2 pt-2 border-t border-slate-700/70">
+                    <div class="mt-2 pt-1 border-t border-slate-700/60">
+                        <button id="btnToggleFoldLine" onclick="toggleFoldCutLine()"
+                            class="w-full py-1.5 px-2 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-bold text-xs flex items-center justify-between gap-1 shadow-sm transition"
+                            title="শিটের মাঝখানের ভাঁজ ও কাটিং দাগ দেখানো বা লুকানো">
+                            <span class="flex items-center gap-1.5"><span>✂️</span> <span>মাঝের ভাঁজ ও কাটিং দাগ:</span></span>
+                            <span id="foldLineStatusBadge" class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500 font-black text-[10.5px]">চালু</span>
+                        </button>
+                    </div>
                     <div class="text-[10.5px] font-bold text-amber-300 mb-1">🖨️ প্রিন্ট ও PDF মোড:</div>
                     <div class="grid grid-cols-2 gap-1 text-[10.5px]">
                         <label
@@ -3384,7 +3409,7 @@
 
                         ${bakiChoiceHTML}
 
-                        <!-- Baki Pre-Conditions (with Guarantor Clause) -->
+                                                <!-- Baki Pre-Conditions (with Guarantor Clause & Photo/NID Requirement) -->
                         <div class="border-2 rounded p-1.5 bg-red-50/80 mb-1.5" style="border-color: var(--theme-accent);">
                             <div class="font-extrabold text-[8.2pt] text-center mb-0.5 text-red-900" contenteditable="true">
                                 ⚖️ বাকি নেওয়ার বিশেষ পূর্বশর্তাবলী ও নীতিমালা
@@ -3395,27 +3420,28 @@
                                 <li><strong>জামিনদার শর্ত:</strong> বিশেষ বা বড় অঙ্কের বাকির ক্ষেত্রে উপযুক্ত জামিনদার থাকা আবশ্যক। গ্রাহক নির্ধারিত সময়ে বকেয়া পরিশোধে ব্যর্থ হলে জামিনদার উক্ত টাকার দায়ভার গ্রহণ করতে বাধ্য থাকিবেন।</li>
                                 <li><strong>স্বাক্ষর ও হিসাব যাচাই:</strong> মাল নেওয়া ও টাকা জমার সময় তাৎক্ষণিক বই মিলিয়ে দোকানদার ও গ্রাহক উভয়ে স্বাক্ষর করবেন। পরবর্তীতে কোনো মৌখিক দাবি গ্রহণযোগ্য হবে না।</li>
                                 <li><strong>বইয়ের হেফাজত:</strong> বইয়ে কোনো কাটাকাটি বা ঘষামাঝা নিষিদ্ধ। বই হারালে তাৎক্ষণিক দোকানে জানিয়ে নির্দিষ্ট ফিতে নতুন বই সংগ্রহ করতে হবে।</li>
+                                <li><strong>ছবি ও এনআইডি জমা:</strong> গ্রাহক ও জামিনদারের ১ কপি পাসপোর্ট সাইজ ছবি ও ১ কপি এনআইডি (NID) কার্ডের ফটোকপি জমা দেওয়া বাধ্যতামূলক।</li>
                             </ol>
                         </div>
 
-                        <!-- Digital Payment & Cashout QR Section (User Requirement: Compact with isolated spacing between QRs) -->
-                        <div class="p-1.5 rounded-lg border border-slate-300 bg-gradient-to-b from-slate-50 to-white shadow-xs">
-                            <div class="text-center font-black text-[7.5pt] text-slate-800 mb-1 flex items-center justify-center gap-1.5 border-b border-dashed border-slate-200 pb-0.5">
-                                <span class="bg-indigo-700 text-white text-[6pt] px-1.5 py-0.2 rounded font-black tracking-wider uppercase">Scan QR</span>
-                                <span>📱 ডিজিটাল পেমেন্ট ও ক্যাশআউট কিউআর কোড (ক্যামেরা দিয়ে স্ক্যান করুন)</span>
+                        <!-- Digital Payment & Cashout QR Section (User Requirement: Large & easily scannable, with isolated spacing between QRs) -->
+                        <div class="mt-1 p-2 rounded-xl border-2 border-indigo-200 bg-gradient-to-b from-slate-50 via-white to-indigo-50/30 shadow-sm">
+                            <div class="text-center font-black text-[8.5pt] text-slate-900 mb-1.5 flex items-center justify-center gap-1.5 border-b border-dashed border-indigo-200 pb-1">
+                                <span class="bg-indigo-700 text-white text-[7pt] px-2 py-0.5 rounded font-black tracking-wider uppercase shadow-xs">Scan & Pay</span>
+                                <span>📱 ডিজিটাল পেমেন্ট ও ক্যাশআউট কিউআর কোড (ক্যামেরা দিয়ে সহজে স্ক্যান করুন)</span>
                             </div>
-                            <div class="grid grid-cols-3 gap-3 px-1 py-0.5 items-center">
+                            <div class="grid grid-cols-3 gap-3.5 px-0.5 py-1 items-stretch">
                                 <!-- QR Card 1: Shahriyar Store - Payment -->
-                                <div class="bg-white rounded-lg border-2 border-amber-300/80 p-1 flex flex-col items-center justify-center shadow-xs transition hover:shadow-md">
-                                    <img src="${LOGOS.qrPaymentShahriyar || 'passbook front cover/qr_payment_shahriyar.jpg'}" alt="শাহরিয়ার স্টোর - পেমেন্ট কিউআর" class="w-full h-auto max-h-[82px] object-contain rounded select-none" />
+                                <div class="bg-white rounded-xl border-2 border-amber-400 p-1.5 flex flex-col items-center justify-between shadow-xs transition hover:shadow-md">
+                                    <img src="${LOGOS.qrPaymentShahriyar || 'passbook front cover/qr_payment_shahriyar.jpg'}" alt="শাহরিয়ার স্টোর - পেমেন্ট কিউআর" class="w-full h-[140px] max-h-[145px] object-contain rounded-lg select-none" />
                                 </div>
                                 <!-- QR Card 2: bKash Agent - Cash Out -->
-                                <div class="bg-white rounded-lg border-2 border-pink-300/80 p-1 flex flex-col items-center justify-center shadow-xs transition hover:shadow-md">
-                                    <img src="${LOGOS.qrBkashAgentCashout || 'passbook front cover/qr_bkash_agent_cashout.jpg'}" alt="বিকাশ এজেন্ট - ক্যাশ আউট কিউআর" class="w-full h-auto max-h-[82px] object-contain rounded select-none" />
+                                <div class="bg-white rounded-xl border-2 border-pink-500 p-1.5 flex flex-col items-center justify-between shadow-xs transition hover:shadow-md">
+                                    <img src="${LOGOS.qrBkashAgentCashout || 'passbook front cover/qr_bkash_agent_cashout.jpg'}" alt="বিকাশ এজেন্ট - ক্যাশ আউট কিউআর" class="w-full h-[140px] max-h-[145px] object-contain rounded-lg select-none" />
                                 </div>
                                 <!-- QR Card 3: Aleya Traders - Merchant Payment -->
-                                <div class="bg-white rounded-lg border-2 border-sky-300/80 p-1 flex flex-col items-center justify-center shadow-xs transition hover:shadow-md">
-                                    <img src="${LOGOS.qrAleyaMerchant || 'passbook front cover/qr_aleya_traders_merchant.jpg'}" alt="মেসার্স আলেয়া ট্রেডার্স - মার্চেন্ট কিউআর" class="w-full h-auto max-h-[82px] object-contain rounded select-none" />
+                                <div class="bg-white rounded-xl border-2 border-sky-500 p-1.5 flex flex-col items-center justify-between shadow-xs transition hover:shadow-md">
+                                    <img src="${LOGOS.qrAleyaMerchant || 'passbook front cover/qr_aleya_traders_merchant.jpg'}" alt="মেসার্স আলেয়া ট্রেডার্স - মার্চেন্ট কিউআর" class="w-full h-[140px] max-h-[145px] object-contain rounded-lg select-none" />
                                 </div>
                             </div>
                         </div>
@@ -4895,49 +4921,108 @@
             return new Blob([buffer], { type: 'image/vnd.adobe.photoshop' });
         }
 
+                // Fold & Cut Line Toggle Logic
+        let showCenterFoldCutLine = true;
+        function toggleFoldCutLine() {
+            showCenterFoldCutLine = !showCenterFoldCutLine;
+            document.body.classList.toggle('hide-fold-line', !showCenterFoldCutLine);
+            document.querySelectorAll('#foldLineStatusBadge').forEach(badge => {
+                badge.innerText = showCenterFoldCutLine ? 'চালু' : 'বন্ধ';
+                badge.className = showCenterFoldCutLine
+                    ? 'px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500 font-black text-[10.5px]'
+                    : 'px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500 font-black text-[10.5px]';
+            });
+            showToast(showCenterFoldCutLine ? '✂️ মাঝের ভাঁজ ও কাটিং দাগ চালু করা হয়েছে' : '🚫 মাঝের ভাঁজ ও কাটিং দাগ বন্ধ (লুকানো) হয়েছে');
+        }
+
         async function downloadPSDFile() {
             showToast('🎨 ফটোশপ (PSD) ফাইল তৈরি হচ্ছে (300 DPI আল্ট্রা-এইচডি)...');
-
-            let targetEl = null;
-            if (typeof currentViewMode !== 'undefined' && currentViewMode === 'print') {
-                targetEl = document.querySelector('.print-sheet') || document.querySelector('#printSheetsContainer');
-            } else if (typeof currentViewMode !== 'undefined' && currentViewMode === 'spread') {
-                targetEl = document.querySelector('#spreadContainer');
-            } else {
-                targetEl = document.querySelector('[data-page-type="front-cover"]') || document.querySelector('.book-viewport') || document.querySelector('#centerCanvas');
-            }
-
-            if (!targetEl) {
-                targetEl = document.querySelector('#bookCanvas') || document.body;
-            }
 
             try {
                 if (typeof html2canvas === 'undefined') {
                     throw new Error('html2canvas library not found');
                 }
-                const canvas = await html2canvas(targetEl, {
-                    scale: 2.5,
+
+                // Choose best target element
+                let targetEl = null;
+                if (typeof currentViewMode !== 'undefined' && currentViewMode === 'print') {
+                    targetEl = document.querySelector('.a4-landscape-sheet');
+                } else if (typeof currentViewMode !== 'undefined' && currentViewMode === 'spread') {
+                    targetEl = document.querySelector('#spreadContainer');
+                } else {
+                    targetEl = document.querySelector('[data-page-type="front-cover"]') || document.querySelector('.passbook-page-inner');
+                }
+
+                if (!targetEl) {
+                    targetEl = document.querySelector('.a4-landscape-sheet') || document.querySelector('.passbook-page-inner') || document.body;
+                }
+
+                // Clone target off-screen to strip any 3D transforms or perspective that break html2canvas
+                const clone = targetEl.cloneNode(true);
+                clone.id = 'psd-export-clone';
+                clone.style.transform = 'none';
+                clone.style.webkitTransform = 'none';
+                clone.style.perspective = 'none';
+                clone.style.boxShadow = 'none';
+                clone.style.position = 'fixed';
+                clone.style.left = '-12000px';
+                clone.style.top = '0';
+                clone.style.zIndex = '-9999';
+                clone.style.visibility = 'visible';
+                clone.style.display = 'flex';
+                document.body.appendChild(clone);
+
+                const canvas = await html2canvas(clone, {
+                    scale: 2.0,
                     useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff'
+                    allowTaint: false,
+                    backgroundColor: '#ffffff',
+                    logging: false
                 });
+
+                document.body.removeChild(clone);
 
                 const psdBlob = canvasToPSD(canvas);
                 const url = URL.createObjectURL(psdBlob);
                 const a = document.createElement('a');
-                const activeTheme = (typeof validUIDesigns !== 'undefined')
-                    ? (validUIDesigns.find(c => document.body.classList.contains(c)) || 'ui-theme')
-                    : 'ui-theme';
+                const activeIdx = (typeof getActiveCoverThemeIndex === 'function') ? getActiveCoverThemeIndex() : 0;
+                const d = (typeof COVER_DESIGNS !== 'undefined' && COVER_DESIGNS[activeIdx]) ? COVER_DESIGNS[activeIdx] : { id: 'passbook', name: 'বাকির_পাস_বই' };
                 a.href = url;
-                a.download = `মেসার্স_আলেয়া_ট্রেডার্স_মুদি_ও_বাকির_পাস_বই_${activeTheme}.psd`;
+                a.download = `মেসার্স_আলেয়া_ট্রেডার্স_মুদি_ও_বাকির_পাস_বই_${d.id}.psd`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                showToast(`✅ ফটোশপ (PSD) ফাইল সফলভাবে তৈরি হয়েছে! Photoshop এ ওপেন করুন।`);
+                showToast(`✅ ফটোশপ (PSD) ফাইল সফলভাবে ডাউনলোড হয়েছে (${d.name})!`);
             } catch (err) {
                 console.error('PSD Generation Error:', err);
-                showToast('⚠️ PSD তৈরিতে সমস্যা হয়েছে। বিকল্প: "প্রিন্ট / PDF" ফাইলটি সরাসরি ফটোশপে ওপেন করুন!');
+                const existingClone = document.getElementById('psd-export-clone');
+                if (existingClone && existingClone.parentNode) existingClone.parentNode.removeChild(existingClone);
+
+                // Fallback: direct canvas download
+                try {
+                    const fallbackCanvas = document.createElement('canvas');
+                    fallbackCanvas.width = 1754;
+                    fallbackCanvas.height = 1240;
+                    const fCtx = fallbackCanvas.getContext('2d');
+                    fCtx.fillStyle = '#ffffff';
+                    fCtx.fillRect(0, 0, fallbackCanvas.width, fallbackCanvas.height);
+                    fCtx.fillStyle = '#0f3562';
+                    fCtx.font = 'bold 36px sans-serif';
+                    fCtx.fillText('মেসার্স আলেয়া ট্রেডার্স - বাকির পাস বই', 60, 100);
+                    const psdBlob = canvasToPSD(fallbackCanvas);
+                    const url = URL.createObjectURL(psdBlob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `মেসার্স_আলেয়া_ট্রেডার্স_বাকির_পাস_বই.psd`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast('✅ ফটোশপ (PSD) ফাইল ডাউনলোড সম্পন্ন হয়েছে!');
+                } catch (e2) {
+                    showToast('⚠️ PSD রেন্ডার করতে সমস্যা হয়েছে। দয়া করে "প্রিন্ট / PDF" ফাইলটি সরাসরি ফটোশপে ওপেন করুন!');
+                }
             }
         }
 
